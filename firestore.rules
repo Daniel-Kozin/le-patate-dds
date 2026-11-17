@@ -6,15 +6,16 @@ service cloud.firestore {
     function isBoard(coll) {
       return coll in ['scores_normal', 'scores_hard', 'scores_eviatar'];
     }
+    // tier 0-8 = biggest lecturer reached, 9 = reached the secret character (navy / 8200)
     function valid(d) {
       return d.keys().hasOnly(['name', 'machzor', 'score', 'tier', 'navy', 'games', 'at'])
         && d.name is string && d.name.size() > 0 && d.name.size() <= 16
         && d.machzor in ['ה', 'ו', 'ז', 'ח', 'ט', 'אחר']
-        && d.score is int && d.score >= 0 && d.score <= 100000000
-        && d.tier is int && d.tier >= 0 && d.tier <= 40
-        && d.navy is bool
-        && d.games is int && d.games >= 0
-        && d.at is int;
+        && d.score is int && d.score >= 0 && d.score <= 1000000
+        && d.tier is int && d.tier >= 0 && d.tier <= 9
+        && d.navy is bool && d.navy == (d.tier == 9)
+        && d.games is int && d.games >= 1 && d.games <= 100000
+        && d.at is int && d.at <= request.time.toMillis() + 600000;
     }
     // the kept run can only get better: drafted first, then biggest lecturer, then score
     function notWorse(n, o) {
@@ -25,10 +26,11 @@ service cloud.firestore {
 
     match /{coll}/{player} {
       allow read: if isBoard(coll);
-      allow create: if isBoard(coll) && valid(request.resource.data);
+      allow create: if isBoard(coll) && valid(request.resource.data) && request.resource.data.games == 1;
       allow update: if isBoard(coll) && valid(request.resource.data)
         && notWorse(request.resource.data, resource.data)
-        && request.resource.data.name == resource.data.name;
+        && request.resource.data.name == resource.data.name
+        && request.resource.data.games == resource.data.get('games', 0) + 1;
       allow delete: if false;
     }
   }

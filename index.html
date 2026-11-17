@@ -2657,6 +2657,7 @@ const FIREBASE_CONFIG = {"apiKey": "AIzaSyCyOjxfVO8SY_i2iTSNL9nkgo2iXJuvWWI", "a
 const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar'], LB_COLL = m => 'scores_' + m;
 const lbKey = (n, mz) => 'u_' + Array.from(n.trim().toLowerCase() + (mz ? '~~' + mz : '')).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
 const MACH = ['ה', 'ו', 'ז', 'ח', 'ט', 'אחר'];
+const LB_MAX = 1000000;
 const lbRank = r => [r.navy ? 1 : 0, r.tier, r.score];
 const lbCmp = (a, b) => { const x = lbRank(a), y = lbRank(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return y[i] - x[i]; return 0; };
 let fb = null, lbRows = {normal: [], hard: [], eviatar: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading'}, lbView = 'eviatar';
@@ -2670,7 +2671,8 @@ const fbReady = (async () => {
     for (const m of LB_MODES){
       fs.onSnapshot(fs.query(fs.collection(fb.db, LB_COLL(m)), fs.orderBy('score', 'desc'), fs.limit(300)), snap => {
         lbRows[m] = snap.docs.map(d => { const v = d.data() || {}; return {key: d.id, name: String(v.name || '?').slice(0, 16), mach: MACH.includes(v.machzor) ? v.machzor : '',
-          score: Number.isFinite(+v.score) ? Math.max(0, Math.floor(+v.score)) : 0, tier: Number.isInteger(v.tier) ? v.tier : -1, navy: v.navy === true}; }).sort(lbCmp);
+          score: Number.isFinite(+v.score) ? Math.max(0, Math.floor(+v.score)) : 0, tier: Number.isInteger(v.tier) ? v.tier : -1, navy: v.navy === true}; })
+          .filter(r => r.score <= LB_MAX && r.tier <= N && (!r.navy || r.tier === N)).sort(lbCmp); // impossible scores are hidden automatically
         lbState[m] = 'ok'; renderLb();
       }, () => { lbState[m] = 'error'; renderLb(); });
     }
