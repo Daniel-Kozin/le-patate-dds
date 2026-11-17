@@ -115,6 +115,33 @@
   .lbtabs{display:flex;gap:6px;margin:6px 0 8px}
   .lbtabs button{flex:1;background:#ece9f5;color:#4a4070;box-shadow:none;border:2px solid transparent;font-size:14px;padding:8px 4px}
   .lbtabs button.sel{border-color:#7950f2;background:#efe9ff;color:#2b1d5c}
+  .panel.adm{max-width:min(96vw,900px);width:96vw;max-height:92vh;overflow-y:auto}
+  .admhead{display:flex;align-items:center;gap:8px;position:sticky;top:-18px;background:#fff;padding:4px 0;z-index:1}
+  .admhead h3{margin:0}
+  .adm h4{margin:16px 0 6px;color:#2b1d5c}
+  .admcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .admcard{background:#f3f0ff;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column}
+  .admcard b{font-size:22px;color:#2b1d5c}
+  .admcard span{font-size:12px;color:#6a5fa0}
+  .admchart{margin-top:14px}
+  .admct{font-weight:700;font-size:14px;color:#2b1d5c;margin-bottom:4px}
+  .admbars{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid #d6d0f0;padding-top:16px}
+  .admcol{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;min-width:0}
+  .admcol:hover .admbar{background:#5f3dc4}
+  .admbar{width:70%;background:#7950f2;border-radius:4px 4px 0 0;min-height:0}
+  .admv{font-size:10px;color:#2b1d5c;font-weight:700;line-height:1;margin-bottom:2px}
+  .admx{position:absolute;bottom:-16px;font-size:9px;color:#6a5fa0;white-space:nowrap}
+  .admbars + *{margin-top:20px}
+  .admchart{margin-bottom:18px}
+  .admt{width:100%;border-collapse:collapse;font-size:13px}
+  .admt th{text-align:left;color:#6a5fa0;font-weight:700;border-bottom:2px solid #e5dbff;padding:4px 6px;white-space:nowrap}
+  .admt td{border-bottom:1px solid #f1ecff;padding:4px 6px;white-space:nowrap;color:#2b1d5c}
+  .admt .mz{color:#6a5fa0}
+  .admt .anon{color:#adb5bd}
+  .admt .u82{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:900;color:#2bff88;background:#021a0a;border:2px solid #2bff88;border-radius:6px;padding:0 3px}
+  .admscroll{overflow-x:auto}
+  .admwarn{background:#fff3bf;border-radius:10px;padding:10px;font-size:14px;color:#5c3c00;margin-top:8px}
+  .admnote{font-size:13px;color:#6a5fa0;margin:4px 0 0}
   .ltoast{position:fixed;left:50%;top:64px;transform:translate(-50%,-20px);opacity:0;z-index:60;pointer-events:none;max-width:min(92vw,360px);
     background:#2b1d5c;color:#fff;border:3px solid #ffd43b;border-radius:14px;padding:9px 14px;font-size:15px;font-weight:600;text-align:center;
     box-shadow:0 6px 18px rgba(0,0,0,.35);transition:opacity .25s,transform .25s}
@@ -508,7 +535,7 @@
     <h3>Le Patate DDS</h3>
     <p style="font-size:17px;margin:10px 0 4px">Made by <b>Daniel Kozin</b></p>
     <p style="font-size:15px;margin:0 0 6px;color:#6a5fa0">Inspired by Guy Sokolik</p>
-    <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button></p>
+    <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button> <button id="adminBtn" class="add" type="button">📊 Admin panel</button></p>
     <p id="testMinis" class="hidden" style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px"><b style="width:100%;font-size:14px">🧪 Try a minigame (Eviatar mode):</b><button class="add" type="button" data-mini="who">🧩 Who's this?</button><button class="add" type="button" data-mini="memory">🃏 Memory</button><button class="add" type="button" data-mini="react">⏱️ Exam starts NOW</button><button class="add" type="button" data-mini="coffee">☕ Coffee</button><button class="add" type="button" data-mini="mistake">🔍 Find the mistake</button><button class="add" type="button" data-mini="type">⌨️ Type the word</button></p>
     <div class="actions"><span style="flex:1"></span><button id="infoDone">Done</button><span style="flex:1"></span></div>
   </div>
@@ -971,8 +998,10 @@ function rndSpawn(){
 let testMode = false, testQueue = [];
 const spawn = () => testQueue.length ? testQueue.shift() : rndSpawn();
 function gilaTier(){ const i = people.findIndex(p => /gila/i.test(p.name)); return i >= 0 && i < N ? i : Math.max(0, N - 2); }
+let gstats = {drops: 0, merges: 0, miniOk: 0, miniBad: 0, typeOk: 0, typeBad: 0};
 function reset(){
   clearAnnouncements();
+  gstats = {drops: 0, merges: 0, miniOk: 0, miniBad: 0, typeOk: 0, typeBad: 0};
   lastActionAt = 0; idleShown = false; dangerShown = false;
   balls = []; nid = 1; score = 0; cur = spawn(); next = spawn(); aimX = W/2; lastDrop = -1e9;
   dangerTime = 0; over = false; floats = []; parts = []; seenTier = new Set([0,1,2]); comboCount = 0; comboTimer = 0; shake = 0; simTime = 0;
@@ -1068,12 +1097,14 @@ function drop(force){
   if (curBomb){ b.bomb = simTime + BOMB_TIME; sideNote('#e03131', '💣 פצצה!', `מזגו אותה תוך ${BOMB_TIME} שניות או שהיא מתפוצצת`, 3500); }
   cur = next; next = spawn(); discover(next); curBomb = nextBomb; nextBomb = false;
   if (!force && isHard() && !qActive){ qDrops++; setModeTag(); }
+  if (!force) gstats.drops++;
   if (!force){ lastManualDrop = simTime; if (isEvi()){ eviDrops++; if (!wallBar) barDrops++; } }
   if (wallBar) wallBar.left--;
   updateHud();
 }
 function onMerge(nb){
   const t = nb.t, name = people[t].name;
+  gstats.merges++;
   discover(t); topTier = Math.max(topTier, t);
   if (isEvi()) addTime(TIME_MERGE*t, nb.x, nb.y - nb.r - 26);
   gain(POINTS[t], nb.x, nb.y + nb.r + 12);
@@ -1322,6 +1353,7 @@ function jackpot(x, y){
   updateHud();
 }
 function gameOver(reason){
+  logGameEnd(reason === 'time' ? 'time' : 'top');
   over = true;
   document.getElementById('overTitle').textContent = reason === 'time' ? 'Pens down! ✏️' : 'Moed Bet!';
   closeQuestion(); tbRemove(); eventsClear(); eviClear();
@@ -1581,7 +1613,7 @@ document.getElementById('mFile').onchange = async e => {
 };
 (async () => { try{ const b = await idbGet('music'); if (b){ customBlob = b; if (actx && musicBus) decodeCustom(); } }catch(e){} setMusicStatus(); })();
 setMusicLabel();
-function newGame(){ clearTimeout(navyTimer); navyTimer = 0; audio(); decodeClips(); stopVoice(); clearAnnouncements(); reset(); say('restart', 'Le patate! New semester!', 50); }
+function newGame(){ logGameEnd('restart'); gameLogged = false; clearTimeout(navyTimer); navyTimer = 0; audio(); decodeClips(); stopVoice(); clearAnnouncements(); reset(); say('restart', 'Le patate! New semester!', 50); }
 document.getElementById('restartBtn').onclick = () => askName();
 document.getElementById('againBtn').onclick = () => askName();
 // the name is only asked for at the end of a game
@@ -2095,6 +2127,7 @@ function typeEnd(ok, timeout){
   if (ok === null){ typing = null; twrap.classList.add('hidden'); tIn.blur(); return; }
   typing.done = true; tIn.disabled = true; tIn.blur();
   tIn.classList.add(ok ? 'ok' : 'bad');
+  if (ok) gstats.typeOk++; else gstats.typeBad++;
   if (ok){
     gain(50); addTime(8); pushWalls();
     floatText(`SPELLED IT! +${50*cfg().mult}`, W/2, 140, '#69db7c', 24);
@@ -2148,6 +2181,7 @@ function miniEnd(ok, msg){
   if (ok === null){ mini = null; mwrap.classList.add('hidden'); mBody.innerHTML = ''; return; }
   if (mini.done) return;
   mini.done = true;
+  if (ok) gstats.miniOk++; else gstats.miniBad++;
   if (ok){
     if (mini.type === 'coffee'){ boostUntil = simTime + 10; addTime(4); }
     else { gain(50); addTime(6); pushWalls(); }
@@ -2755,6 +2789,122 @@ document.getElementById('lbBtn').onclick = () => { if (!nameModal.classList.cont
 function closeLb(){ lbModal.classList.add('hidden'); paused = false; }
 document.getElementById('lbDone').onclick = closeLb;
 lbModal.addEventListener('click', e => { if (e.target === lbModal) closeLb(); });
+
+// ---------- game log (for the admin panel): one entry per page visit and per finished game ----------
+const VID = (() => { let v = store.get('lupatat-vid', ''); if (!v){ v = Math.random().toString(36).slice(2, 10); store.set('lupatat-vid', v); } return v; })();
+const DEV = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'm' : 'd';
+let logOn = true;
+async function logEntry(doc){
+  if (!logOn || testMode) return;
+  const F = await fbReady; if (!F) return;
+  try{ await F.fs.addDoc(F.fs.collection(F.db, 'log'), {...doc, v: VID, n: username || '', m: store.get('lupatat-machzor', ''), dev: DEV, at: Date.now()}); }
+  catch(e){ logOn = false; } // the log rule isn't published yet
+}
+const firstVisit = !store.get('lupatat-visited', false); store.set('lupatat-visited', true);
+logEntry({t: 'visit', first: firstVisit});
+let gameLogged = false;
+function logGameEnd(end){
+  if (over && end !== 'time' && end !== 'top') return; // already over (and already logged)
+  if (gameLogged || testMode || !gstats || (gstats.drops < 3 && (end === 'restart' || end === 'closed'))) return;
+  gameLogged = true;
+  logEntry({t: 'game', mode: gameMode, end, score: Math.max(0, Math.floor(score)), tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), navy: !!gotSecret,
+    dur: Math.round(simTime), drops: gstats.drops, merges: gstats.merges, qok: qRight, qn: qTotal, mok: gstats.miniOk, mbad: gstats.miniBad, tok: gstats.typeOk, tbad: gstats.typeBad});
+}
+window.addEventListener('pagehide', () => { if (!over) logGameEnd('closed'); });
+
+// ---------- admin panel (test mode only) ----------
+const adminModal = document.createElement('div'); adminModal.id = 'adminModal'; adminModal.className = 'modal hidden';
+adminModal.innerHTML = '<div class="panel adm"><div class="admhead"><h3>📊 Admin panel</h3><span style="flex:1"></span><button type="button" class="ghost" id="admRefresh">↻ Refresh</button><button type="button" id="admClose">Close</button></div><div id="admBody">Loading…</div></div>';
+document.body.appendChild(adminModal);
+document.getElementById('admClose').onclick = () => { adminModal.classList.add('hidden'); paused = false; };
+document.getElementById('admRefresh').onclick = () => loadAdmin();
+adminModal.addEventListener('click', e => { if (e.target === adminModal){ adminModal.classList.add('hidden'); paused = false; } });
+function openAdmin(){ closeInfo(); paused = true; adminModal.classList.remove('hidden'); loadAdmin(); }
+{ const ab = document.getElementById('adminBtn'); if (ab) ab.onclick = openAdmin; }
+const MODE_NAME = {normal: 'Normal', hard: 'Hard', eviatar: 'Eviatar'};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const ago = t => { const s = (Date.now() - t)/1000; return s < 60 ? 'just now' : s < 3600 ? Math.floor(s/60) + 'm ago' : s < 86400 ? Math.floor(s/3600) + 'h ago' : Math.floor(s/86400) + 'd ago'; };
+const mmss = s => `${Math.floor(s/60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const pct = (a, b) => b ? Math.round(100*a/b) + '%' : '-';
+const dayKey = t => { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+const who2 = e => e.n ? esc(e.n) + (e.m && e.m !== 'אחר' ? ` <span class="mz">- מחזור ${esc(e.m)}</span>` : '') : `<span class="anon">anon #${esc(String(e.v || '').slice(0, 4))}</span>`;
+const tierCell = e => e.navy ? (e.mode === 'eviatar' ? '<span class="u82">8200</span>' : '⚓') : (Number.isInteger(e.tier) && e.tier >= 0 && e.tier < N ? esc(P(e.tier).name) : '-');
+function bars(vals, labels, title, fmt = v => v){
+  const max = Math.max(1, ...vals);
+  return `<div class="admchart"><div class="admct">${title}</div><div class="admbars">` + vals.map((v, i) =>
+    `<div class="admcol" title="${esc(labels[i])}: ${fmt(v)}"><div class="admv">${v ? fmt(v) : ''}</div><div class="admbar" style="height:${Math.round(100*v/max)}%"></div><div class="admx">${esc(labels[i])}</div></div>`).join('') + '</div></div>';
+}
+async function loadAdmin(){
+  const body = document.getElementById('admBody'); body.innerHTML = 'Loading…';
+  const F = await fbReady; if (!F){ body.textContent = 'Firebase is not connected.'; return; }
+  const {fs, db} = F;
+  // 1. the leaderboards (always available)
+  const boards = {};
+  for (const m of LB_MODES){
+    try{ boards[m] = (await fs.getDocs(fs.collection(db, LB_COLL(m)))).docs.map(d => ({id: d.id, ...d.data()})); }catch(e){ boards[m] = []; }
+  }
+  // 2. the game log (needs the log rule)
+  let log = null;
+  try{ log = (await fs.getDocs(fs.query(fs.collection(db, 'log'), fs.orderBy('at', 'desc'), fs.limit(4000)))).docs.map(d => d.data()); }catch(e){ log = null; }
+  let h = '';
+  const now = Date.now(), DAY = 86400000;
+  if (log && log.length){
+    const games = log.filter(e => e.t === 'game'), visits = log.filter(e => e.t === 'visit');
+    const players = new Set(games.map(e => e.v)), visitors = new Set(log.map(e => e.v));
+    const today = dayKey(now), gToday = games.filter(e => dayKey(e.at) === today);
+    const durs = games.map(e => e.dur || 0), totalTime = durs.reduce((a, b) => a + b, 0);
+    const qok = games.reduce((a, e) => a + (e.qok || 0), 0), qn = games.reduce((a, e) => a + (e.qn || 0), 0);
+    const mok = games.reduce((a, e) => a + (e.mok || 0), 0), mn = mok + games.reduce((a, e) => a + (e.mbad || 0), 0);
+    const tok = games.reduce((a, e) => a + (e.tok || 0), 0), tn = tok + games.reduce((a, e) => a + (e.tbad || 0), 0);
+    const card = (big, small) => `<div class="admcard"><b>${big}</b><span>${small}</span></div>`;
+    h += '<h4>Overview</h4><div class="admcards">' +
+      card(players.size, 'people played') + card(visitors.size, 'visitors') + card(visits.length, 'page visits') + card(games.length, 'games played') +
+      card(gToday.length, 'games today') + card(new Set(gToday.map(e => e.v)).size, 'players today') +
+      card(games.filter(e => now - e.at < 3600000).length, 'games in the last hour') + card(new Set(log.filter(e => now - e.at < 900000).map(e => e.v)).size, 'online (last 15 min)') +
+      card(games.length ? mmss(totalTime/games.length) : '-', 'average game') + card(games.length ? mmss(Math.max(...durs)) : '-', 'longest game') +
+      card(Math.round(totalTime/3600*10)/10 + 'h', 'total time played') + card(players.size ? (games.length/players.size).toFixed(1) : '-', 'games per player') +
+      card(pct(qok, qn), `quiz right (${qok}/${qn})`) + card(pct(mok, mn), `minigames won (${mok}/${mn})`) + card(pct(tok, tn), `words typed (${tok}/${tn})`) +
+      card(pct(visits.filter(e => e.dev === 'm').length, visits.length), 'on phones') +
+      card(pct(players.size, visitors.size), 'visitors who played') + card(games.filter(e => e.navy).length, 'reached the end') + '</div>';
+    const days = [], dl = [];
+    for (let i = 13; i >= 0; i--){ const t = now - i*DAY, k = dayKey(t); days.push(games.filter(e => dayKey(e.at) === k).length); dl.push(new Date(t).getDate() + '/' + (new Date(t).getMonth() + 1)); }
+    h += bars(days, dl, 'Games per day (last 14 days)');
+    const pd = []; for (let i = 13; i >= 0; i--){ const k = dayKey(now - i*DAY); pd.push(new Set(games.filter(e => dayKey(e.at) === k).map(e => e.v)).size); }
+    h += bars(pd, dl, 'Players per day (last 14 days)');
+    const hrs = Array(24).fill(0); games.forEach(e => hrs[new Date(e.at).getHours()]++);
+    h += bars(hrs, hrs.map((_, i) => String(i)), 'When people play (hour of day)');
+    h += '<h4>By mode</h4><table class="admt"><tr><th>Mode</th><th>Games</th><th>Players</th><th>Avg score</th><th>Best</th><th>Avg length</th><th>Reached the end</th></tr>' +
+      LB_MODES.map(m => { const g = games.filter(e => e.mode === m); return `<tr><td>${MODE_NAME[m]}</td><td>${g.length}</td><td>${new Set(g.map(e => e.v)).size}</td><td>${g.length ? Math.round(g.reduce((a, e) => a + e.score, 0)/g.length) : '-'}</td><td>${g.length ? Math.max(...g.map(e => e.score)) : '-'}</td><td>${g.length ? mmss(g.reduce((a, e) => a + (e.dur || 0), 0)/g.length) : '-'}</td><td>${g.filter(e => e.navy).length}</td></tr>`; }).join('') + '</table>';
+    const ends = {}; games.forEach(e => ends[e.end] = (ends[e.end] || 0) + 1);
+    const END = {top: 'Board overflowed', time: 'Exam time ran out', restart: 'Restarted', closed: 'Closed the page'};
+    h += '<h4>How games end</h4><div class="admcards">' + Object.entries(ends).map(([k, v]) => card(v, END[k] || k)).join('') + '</div>';
+    h += '<h4>Last 40 games</h4><div class="admscroll"><table class="admt"><tr><th>When</th><th>Player</th><th>Mode</th><th>Score</th><th>Biggest</th><th>Length</th><th>Quiz</th><th>Mini</th><th>Ended</th><th></th></tr>' +
+      games.slice(0, 40).map(e => `<tr><td>${ago(e.at)}</td><td>${who2(e)}</td><td>${MODE_NAME[e.mode] || esc(e.mode)}</td><td><b>${e.score}</b></td><td>${tierCell(e)}</td><td>${mmss(e.dur || 0)}</td><td>${e.qok || 0}/${e.qn || 0}</td><td>${e.mok || 0}/${(e.mok || 0) + (e.mbad || 0)}</td><td>${esc(END[e.end] || e.end)}</td><td>${e.dev === 'm' ? '📱' : '💻'}</td></tr>`).join('') + '</table></div>';
+    const per = {};
+    log.forEach(e => { const p = per[e.v] || (per[e.v] = {v: e.v, n: '', m: '', games: 0, time: 0, best: {}, last: 0, first: Infinity, visits: 0, dev: e.dev});
+      if (e.n && !p.n){ p.n = e.n; p.m = e.m; } p.last = Math.max(p.last, e.at); p.first = Math.min(p.first, e.at);
+      if (e.t === 'visit') p.visits++;
+      if (e.t === 'game'){ p.games++; p.time += e.dur || 0; p.best[e.mode] = Math.max(p.best[e.mode] || 0, e.score); } });
+    const plist = Object.values(per).sort((a, b) => b.last - a.last);
+    h += `<h4>Everyone (${plist.length})</h4><div class="admscroll"><table class="admt"><tr><th>Player</th><th>Last seen</th><th>First seen</th><th>Visits</th><th>Games</th><th>Time played</th><th>Best Normal</th><th>Best Hard</th><th>Best Eviatar</th><th></th></tr>` +
+      plist.map(p => `<tr><td>${who2(p)}</td><td>${ago(p.last)}</td><td>${ago(p.first)}</td><td>${p.visits}</td><td>${p.games}</td><td>${mmss(p.time)}</td><td>${p.best.normal ?? '-'}</td><td>${p.best.hard ?? '-'}</td><td>${p.best.eviatar ?? '-'}</td><td>${p.dev === 'm' ? '📱' : '💻'}</td></tr>`).join('') + '</table></div>';
+  } else {
+    h += `<div class="admwarn">${log ? 'No games logged yet. Play a game (outside test mode) and refresh.' : 'The game log is off: Firebase refused to read it. Add the <b>log</b> rule in Firebase (Firestore Database, Rules) to turn on visits, games, players and times. The leaderboard stats below work without it.'}</div>`;
+  }
+  // leaderboard stats (from the saved scores)
+  const all = LB_MODES.flatMap(m => boards[m].map(d => ({...d, mode: m})));
+  const names = new Set(all.map(d => String(d.name || '').toLowerCase() + '|' + (d.machzor || '')));
+  h += '<h4>Leaderboards (saved scores)</h4><table class="admt"><tr><th>Mode</th><th>Players saved</th><th>Saves</th><th>Top score</th><th>Reached Kurland</th><th>Reached the end</th><th>Last save</th></tr>' +
+    LB_MODES.map(m => { const b = boards[m]; return `<tr><td>${MODE_NAME[m]}</td><td>${b.length}</td><td>${b.reduce((a, d) => a + (d.games || 0), 0)}</td><td>${b.length ? Math.max(...b.map(d => d.score || 0)) : '-'}</td><td>${b.filter(d => d.tier === N - 1).length}</td><td>${b.filter(d => d.navy).length}</td><td>${b.length ? ago(Math.max(...b.map(d => d.at || 0))) : '-'}</td></tr>`; }).join('') + '</table>';
+  h += `<p class="admnote">${names.size} different names saved a score.</p>`;
+  const mz = {}; all.forEach(d => { const k = d.machzor || '(none)'; (mz[k] = mz[k] || {n: new Set(), best: 0}); mz[k].n.add(String(d.name).toLowerCase()); mz[k].best = Math.max(mz[k].best, d.score || 0); });
+  h += '<h4>By מחזור</h4><table class="admt"><tr><th>מחזור</th><th>Players</th><th>Best score</th></tr>' +
+    Object.entries(mz).sort((a, b) => b[1].n.size - a[1].n.size).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.n.size}</td><td>${v.best}</td></tr>`).join('') + '</table>';
+  const recent = all.slice().sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 15);
+  h += '<h4>Latest saves</h4><div class="admscroll"><table class="admt"><tr><th>When</th><th>Player</th><th>Mode</th><th>Best score</th><th>Biggest</th><th>Saves</th></tr>' +
+    recent.map(d => `<tr><td>${d.at ? ago(d.at) : '-'}</td><td>${esc(d.name || '?')}${d.machzor && d.machzor !== 'אחר' ? ` <span class="mz">- מחזור ${esc(d.machzor)}</span>` : ''}</td><td>${MODE_NAME[d.mode]}</td><td><b>${d.score}</b></td><td>${tierCell({...d, mode: d.mode})}</td><td>${d.games || 0}</td></tr>`).join('') + '</table></div>';
+  body.innerHTML = h;
+}
 
 // ---------- live teasing: whoever is above you on the board lets you know ----------
 const ltoast = document.createElement('div'); ltoast.className = 'ltoast'; document.body.appendChild(ltoast);
