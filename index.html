@@ -444,7 +444,7 @@
       <li><span>❌</span><div>Wrong: <b>−100</b>, your biggest character drops <b>two levels</b>, and you fail the course for 15 seconds.</div></li>
       <li><span>👀</span><div><b>Questions about your board:</b> "How many Omers are on the board?" You get 5 seconds.</div></li>
       <li><span>🧠</span><div><b>Recite the lecture:</b> 5 faces flash, then tap them in the same order in the strip under the board.</div></li>
-      <li><span>⌨️</span><div><b>Type the word:</b> a nasty long word pops up. Type it exactly before the timer runs out (half a second per letter). Wrong or too slow counts as a wrong answer.</div></li>
+      <li><span>⌨️</span><div><b>Type the word:</b> a nasty long word pops up. Type it exactly before the timer runs out (half a second per letter, plus 1.5 seconds). Wrong or too slow counts as a wrong answer.</div></li>
       <li><span>🎲</span><div><b>Random minigames</b> (the game keeps running!): 🧩 Who's this?, 🃏 Memory pairs, ⏱️ The exam starts NOW (tap on green, not before), ☕ Coffee break (tap fast for turbo drops) and 🎯 Precision drop.</div></li>
       <li><span>💣</span><div><b>Bomb ball:</b> merge it within 15 seconds or it blows up everything it touches.</div></li>
       <li><span>🧱</span><div><b>Midterm wall:</b> every 20 balls, a bar blocks the middle of the board for the next 35 balls.</div></li>
@@ -1895,7 +1895,7 @@ function reciteEnd(ok){
   updateHud();
   setTimeout(() => { if (!recite) rwrap.classList.add('hidden'); }, 1100);
 }
-// type the word: a nasty 9+ letter word, half a second per letter
+// type the word: a nasty 9+ letter word, half a second per letter plus 1.5 seconds
 const TYPE_WORDS = ['eigendecomposition', 'heteroscedasticity', 'regularization', 'hyperparameter', 'probabilistic', 'Mahalanobis', 'Kullback-Leibler',
   'Chebyshev', 'Lipschitz', 'Riemannian', 'asymptotically', 'Hamiltonian', 'Dirichlet', 'Kolmogorov', 'multicollinearity', 'autoregressive',
   'backpropagation', 'Levenshtein', 'Tikhonov', 'Bhattacharyya', 'Cholesky', 'Nesterov', 'Schwarzschild', 'Gauss-Seidel', 'Karush-Kuhn-Tucker',
@@ -1910,7 +1910,7 @@ let typing = null, typeNext = 0, typeBag = [];
 function typeStart(){
   typeNext = simTime + 45 + Math.random()*25;
   if (!typeBag.length) typeBag = shuffled(TYPE_WORDS);
-  const word = typeBag.pop(), time = word.length*0.5;
+  const word = typeBag.pop(), time = 1.5 + word.length*0.5;
   typing = {word, time, start: simTime, done: false};
   tWord.innerHTML = ''; for (const ch of word){ const sp = document.createElement('span'); sp.textContent = ch; tWord.appendChild(sp); }
   tIn.value = ''; tIn.className = 'tin'; tIn.disabled = false;
