@@ -99,6 +99,7 @@
   .lb .sc{font-weight:700;flex:none}
   .lb .tp{width:24px;height:24px;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px}
   .lb .tp canvas{width:24px;height:24px}
+  .lb .tp{width:auto;min-width:24px}
   .lb .mz{opacity:.75;font-weight:400}
   .lb .nm{direction:ltr;text-align:left}
   .overlay .savebox{flex-wrap:wrap}
@@ -281,6 +282,55 @@
   .rdots i.bad{background:#fa5252}
   #chain .link.pick{cursor:pointer;animation:mPulse .45s ease-in-out infinite alternate}
   #chain .link.pick canvas{box-shadow:0 0 0 4px #ffd43b,0 0 14px 4px #ffd43b;border-radius:50%}
+  /* 8200 recruitment scene (Eviatar mode) */
+  .u8{position:fixed;inset:0;z-index:20;overflow:hidden;background:#020a04;animation:nvIn .4s ease-out;font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace}
+  .u8.out{animation:nvOut .6s ease-in forwards}
+  .u8 canvas.rain{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .u8 .stage{position:absolute;left:50%;top:0;bottom:0;width:min(100vw,520px);transform:translateX(-50%)}
+  .u8 .term{position:absolute;left:6%;right:6%;top:18%;background:rgba(0,20,6,.88);border:2px solid #2bff88;border-radius:10px;padding:12px 14px;color:#2bff88;font-size:min(3.9vw,16px);line-height:1.55;box-shadow:0 0 24px rgba(43,255,136,.35);animation:u8Fade .4s ease 3.4s forwards}
+  .u8 .term .ln{white-space:pre;overflow:hidden;width:0;animation:u8Type .5s steps(32) forwards}
+  .u8 .term .ln.red{color:#ff6b6b}
+  @keyframes u8Type{to{width:100%}}
+  @keyframes u8Fade{to{opacity:0;transform:scale(.92)}}
+  .u8 .radar{position:absolute;left:50%;top:9%;width:220px;height:220px;margin-left:-110px;border-radius:50%;border:2px solid #2bff88;
+    background:radial-gradient(circle,transparent 30%,rgba(43,255,136,.08) 31%,transparent 32%,transparent 60%,rgba(43,255,136,.08) 61%,transparent 62%);opacity:0;
+    animation:u8In .5s ease 3.5s forwards,u8Out .4s ease 8.9s forwards;box-shadow:0 0 40px rgba(43,255,136,.35)}
+  .u8 .radar .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(43,255,136,.55),transparent 22%);animation:u8Spin 1.6s linear infinite}
+  .u8 .radar canvas{position:absolute;left:35px;top:35px;width:150px;height:150px;border-radius:50%;filter:saturate(.3) sepia(.4) hue-rotate(70deg) brightness(1.05);animation:u8Clear .8s ease 4.6s forwards}
+  .u8 .radar .lock{position:absolute;left:25px;top:25px;right:25px;bottom:25px;border:3px solid #ff6b6b;border-radius:50%;opacity:0;animation:u8Lock .5s ease 4.4s forwards}
+  @keyframes u8Spin{to{transform:rotate(360deg)}}
+  @keyframes u8In{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+  @keyframes u8Out{to{opacity:0;transform:scale(.6)}}
+  @keyframes u8Clear{to{filter:none}}
+  @keyframes u8Lock{0%{opacity:0;transform:scale(1.6)}100%{opacity:1;transform:none}}
+  .u8 .tag{position:absolute;left:50%;top:calc(9% + 232px);transform:translateX(-50%);white-space:nowrap;color:#2bff88;border:2px solid #2bff88;background:#021a0a;border-radius:8px;padding:3px 10px;font-weight:700;font-size:min(4vw,16px);opacity:0;animation:u8Show .3s 4.7s forwards,u8Out .4s ease 8.9s forwards}
+  .u8 .tag.cls{top:calc(9% + 266px);color:#ff6b6b;border-color:#ff6b6b;animation:u8Show .3s 5.1s forwards,blink .5s steps(2) 5.1s 6,u8Out .4s ease 8.9s forwards}
+  @keyframes u8Show{to{opacity:1}}
+  .u8 .bub{position:absolute;direction:rtl;background:#fff;color:#021a0a;border:4px solid #000;border-radius:18px;padding:6px 12px;font-weight:900;font-family:system-ui,'Segoe UI',Arial,sans-serif;font-size:min(5.2vw,24px);white-space:nowrap}
+  .u8 .say{left:50%;top:calc(9% + 306px);transform:translateX(-50%) scale(0);animation:u8Pop .5s cubic-bezier(.2,1.6,.4,1) 5.6s forwards,u8Out .4s ease 8.9s forwards}
+  .u8 .sal{position:absolute;left:4%;top:56%;display:flex;align-items:center;gap:8px;opacity:0;animation:u8Show .3s 6.6s forwards,u8Out .4s ease 8.9s forwards}
+  .u8 .sal .hand{font-size:70px;line-height:1;animation:nvHand .25s ease-in-out 6.8s 4 alternate}
+  @keyframes u8Pop{to{transform:translateX(-50%) scale(1)}}
+  .u8 .count{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);font-weight:900;font-size:min(30vw,150px);letter-spacing:4px;color:#2bff88;text-shadow:0 0 30px #2bff88,4px 4px 0 #000;opacity:0;animation:u8Show .2s 9.1s forwards}
+  .u8 .count.hit{animation:u8Show .2s 9.1s forwards,u8Glitch .12s steps(2) 10.6s 5,u8Gone .3s ease 13.3s forwards}
+  @keyframes u8Gone{to{opacity:0}}
+  @keyframes u8Glitch{0%{transform:translate(-52%,-50%) skewX(12deg);color:#ff6b6b}100%{transform:translate(-48%,-51%) skewX(-12deg);color:#74c0fc}}
+  .u8 .flash{position:absolute;inset:0;background:#fff;opacity:0;animation:u8Flash .6s ease 10.6s forwards;pointer-events:none}
+  .u8 .flash.f2{animation:u8Flash .6s ease 13.5s forwards}
+  @keyframes u8Flash{0%{opacity:.9}100%{opacity:0}}
+  .u8 .kit{position:absolute;top:56%;font-size:64px;opacity:0;filter:drop-shadow(0 0 14px #2bff88)}
+  .u8 .kit.a{left:18%;animation:u8Fly1 .7s cubic-bezier(.2,1.4,.4,1) 11s forwards,u8Gone .3s ease 13.3s forwards}
+  .u8 .kit.b{left:42%;animation:u8Fly1 .7s cubic-bezier(.2,1.4,.4,1) 11.25s forwards,u8Gone .3s ease 13.3s forwards}
+  .u8 .kit.c{left:66%;animation:u8Fly1 .7s cubic-bezier(.2,1.4,.4,1) 11.5s forwards,u8Gone .3s ease 13.3s forwards}
+  @keyframes u8Fly1{from{opacity:0;transform:translateY(160px) rotate(-30deg) scale(.3)}to{opacity:1;transform:none}}
+  .u8 .got{left:50%;top:72%;transform:translateX(-50%) scale(0);background:#2bff88;animation:u8Pop .5s cubic-bezier(.2,1.6,.4,1) 12s forwards,u8Gone .3s ease 13.3s forwards}
+  .u8 .title{position:absolute;left:50%;top:26%;width:96%;text-align:center;direction:rtl;font-family:system-ui,'Segoe UI',Arial,sans-serif;font-weight:900;font-size:min(14vw,74px);line-height:1.05;color:#fff;text-shadow:4px 4px 0 #000,0 0 30px #2bff88;opacity:0;transform:translateX(-50%);animation:u8Title .5s cubic-bezier(.2,1.5,.4,1) 13.6s forwards}
+  @keyframes u8Title{from{opacity:0;transform:translateX(-50%) scale(2.5)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+  .u8 .stamp{position:absolute;left:50%;top:50%;transform:translateX(-50%) rotate(-12deg) scale(4);opacity:0;color:#ff2b2b;border:5px solid #ff2b2b;border-radius:8px;padding:2px 14px;font-weight:900;font-size:min(8vw,36px);letter-spacing:3px;white-space:nowrap;background:rgba(255,43,43,.08);animation:u8Stamp .35s cubic-bezier(.5,0,.75,0) 14.3s forwards}
+  @keyframes u8Stamp{to{opacity:.95;transform:translateX(-50%) rotate(-12deg) scale(1)}}
+  .u8 .sub{position:absolute;left:0;right:0;bottom:4%;text-align:center;font-size:17px;letter-spacing:2px;color:#2bff88;opacity:0;animation:nvShow .3s 14.9s forwards,blink .5s steps(2) 14.9s infinite}
+  .u8 .conf{position:absolute;top:-10%;font-size:30px;animation:nvConf 2.8s linear var(--d) forwards;opacity:0}
+  .lb .u82{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;font-weight:900;color:#2bff88;background:#021a0a;border:2px solid #2bff88;border-radius:6px;padding:1px 3px;line-height:1.2;letter-spacing:.5px}
   /* navy enlistment scene */
   .nv{position:fixed;inset:0;z-index:20;overflow:hidden;animation:nvIn .5s ease-out;background:linear-gradient(#1b1450 0%,#5c2a7e 38%,#ff8a5b 66%,#ffd28a 74%,#0b3d7a 74%,#062a57 100%)}
   .nv.out{animation:nvOut .6s ease-in forwards}
@@ -449,7 +499,7 @@
     <h3>Le Patate DDS</h3>
     <p style="font-size:17px;margin:10px 0 4px">Made by <b>Daniel Kozin</b></p>
     <p style="font-size:15px;margin:0 0 6px;color:#6a5fa0">Inspired by Guy Sokolik</p>
-    <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button></p>
+    <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button></p>
     <div class="actions"><span style="flex:1"></span><button id="infoDone">Done</button><span style="flex:1"></span></div>
   </div>
 </div>
@@ -1163,17 +1213,82 @@ function navyScene(){
   setTimeout(() => { if (el.isConnected){ sfx.fanfare(); setTimeout(sfx.fanfare, 450); } }, 5300);
   return el;
 }
+// Eviatar mode ending: recruited to 8200 instead of the navy
+const UNIT_SCENE_MS = 17000;
+function unitScene(){
+  const el = document.createElement('div'); el.className = 'u8';
+  const mk = (cls, txt) => { const d = document.createElement('div'); d.className = cls; if (txt) d.textContent = txt; return d; };
+  // falling code in the background
+  const rain = document.createElement('canvas'); rain.className = 'rain'; el.appendChild(rain);
+  const rw = rain.width = Math.min(900, window.innerWidth), rh = rain.height = Math.min(1100, window.innerHeight), rc = rain.getContext('2d');
+  const CH = '01אבגדהוזחטיכלמנסעפצקרשת8200', fs = 16, cols = Math.ceil(rw/fs), drops = Array.from({length: cols}, () => Math.random()*-40);
+  const rainTick = () => {
+    if (!el.isConnected) return;
+    rc.fillStyle = 'rgba(2,10,4,.18)'; rc.fillRect(0, 0, rw, rh);
+    rc.font = `${fs}px monospace`;
+    drops.forEach((y, i) => { rc.fillStyle = Math.random() < 0.05 ? '#d3ffe4' : '#2bff88'; rc.fillText(CH[Math.floor(Math.random()*CH.length)], i*fs, y*fs); drops[i] = y*fs > rh && Math.random() > 0.96 ? 0 : y + 1; });
+    requestAnimationFrame(rainTick);
+  };
+  const st = mk('stage'); el.appendChild(st);
+  // 1. the terminal intercepts your game
+  const term = mk('term');
+  [['> intercepting transmission…', ''], ['> source: LE PATATE DDS', ''], ['> decrypting ██████████ 100%', ''], ['> subject merged two Kurlands', ''], ['> threat level: TOO SMART', 'red'], ['> verdict: RECRUIT ✔', '']].forEach(([t, c], i) => {
+    const ln = mk('ln ' + c, t); ln.style.animationDelay = (0.3 + i*0.5) + 's'; term.appendChild(ln);
+  });
+  st.appendChild(term);
+  // 2. the commander on the radar
+  const radar = mk('radar'); radar.appendChild(mk('sweep'));
+  const face = document.createElement('canvas'); face.width = face.height = 300; drawBall(face.getContext('2d'), 150, 150, 146, N);
+  radar.append(face, mk('lock'));
+  st.append(radar, mk('tag', `🎖️ ${secret.name || DEFAULT_SECRET.name}`), mk('tag cls', 'סיווג: סודי ביותר'));
+  st.appendChild(mk('bub say', 'יש לך ראש של 8200 😏'));
+  const sal = mk('sal'); sal.append(mk('hand', '🫡'), mk('bub', 'הצדעה!')); sal.lastChild.style.position = 'static'; st.appendChild(sal);
+  // 3. the number
+  const count = mk('count hit', '0000'); st.append(count, mk('flash'), mk('flash f2'));
+  const t0 = performance.now() + 9100;
+  const countTick = () => {
+    if (!el.isConnected) return;
+    const k = Math.min(1, Math.max(0, (performance.now() - t0)/1500));
+    count.textContent = k >= 1 ? '8200' : String(Math.floor(8200*k*k + Math.random()*99)).padStart(4, '0');
+    if (k < 1) requestAnimationFrame(countTick);
+  };
+  setTimeout(countTick, 9100);
+  // 4. the starter kit
+  st.append(mk('kit a', '💻'), mk('kit b', '🧥'), mk('kit c', '🤐'));
+  st.appendChild(mk('bub got', 'קיבלת לפטופ, קפוצ׳ון והסכם סודיות'));
+  st.append(mk('title', 'שובצת ב־\u20668200\u2069'), mk('stamp', 'TOP SECRET'), mk('sub', 'REBOOTING THE BOARD… SCORE KEPT'));
+  for (let i = 0; i < 26; i++){
+    const c = mk('conf', pick(['💻', '📡', '🔐', '🛰️', '💾', '🦄', '🧠', '8200']));
+    c.style.left = (Math.random()*100) + '%'; c.style.setProperty('--d', (13.5 + Math.random()*2) + 's'); c.style.setProperty('--r', (Math.random()*720 - 360) + 'deg');
+    if (c.textContent === '8200'){ c.style.fontSize = '22px'; c.style.color = '#2bff88'; c.style.fontWeight = '900'; }
+    st.appendChild(c);
+  }
+  document.body.appendChild(el); rainTick();
+  // sound: modem, typing, radar pings, counter, boom, stamp, fanfare
+  blip({type: 'sawtooth', f0: 1200, f1: 2400, f2: 900, dur: 0.6, vol: 0.05, delay: 0.1});
+  for (let i = 0; i < 26; i++) blip({type: 'square', f0: 1800 + Math.random()*900, dur: 0.02, vol: 0.04, delay: 0.3 + i*0.11 + Math.random()*0.04});
+  [3.7, 4.5, 5.3, 6.1, 6.9, 7.7].forEach(d => blip({type: 'sine', f0: 1320, f1: 1250, dur: 0.35, vol: 0.08, delay: d}));
+  blip({type: 'square', f0: 660, f1: 990, dur: 0.15, vol: 0.06, delay: 4.4});
+  for (let i = 0; i < 18; i++) blip({type: 'square', f0: 500 + i*60, dur: 0.03, vol: 0.05, delay: 9.1 + i*0.08});
+  blip({type: 'sine', f0: 120, f1: 38, dur: 1.4, vol: 0.35, delay: 10.6});
+  blip({type: 'sawtooth', f0: 200, f1: 1600, dur: 0.5, vol: 0.05, delay: 10.9});
+  [11, 11.25, 11.5].forEach(d => blip({type: 'triangle', f0: 400, f1: 1200, dur: 0.18, vol: 0.07, delay: d}));
+  blip({type: 'sine', f0: 140, f1: 45, dur: 1.2, vol: 0.3, delay: 13.5});
+  blip({type: 'square', f0: 90, f1: 50, dur: 0.25, vol: 0.25, delay: 14.6});
+  setTimeout(() => { if (el.isConnected){ sfx.fanfare(); setTimeout(sfx.fanfare, 450); setTimeout(sfx.fanfare, 900); } }, 13700);
+  return el;
+}
 function navyReboot(){
   navyTimer = 0;
   paused = true;
   stopVoice(); clearAnnouncements();
-  const el = navyScene();
+  const evi = isEvi(), el = evi ? unitScene() : navyScene();
   setTimeout(() => {
     boardReset();
     el.classList.add('out'); setTimeout(() => el.remove(), 650);
     paused = false;
     say('restart', 'Le patate! New semester!', 50);
-  }, NAVY_SCENE_MS);
+  }, evi ? UNIT_SCENE_MS : NAVY_SCENE_MS);
 }
 function jackpot(x, y){
   const last = P(N).name;
@@ -2585,11 +2700,12 @@ async function saveFromGameOver(){
 saveBtn.classList.remove('hidden');
 saveBtn.onclick = saveFromGameOver;
 overNameIn.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); saveFromGameOver(); } });
-function lbItem(r, i, me){
+function lbItem(r, i, me, mode){
   const li = document.createElement('li'); if (me) li.className = 'me';
   const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = i < 3 ? ['🥇', '🥈', '🥉'][i] : (i + 1) + '.';
   const tp = document.createElement('span'); tp.className = 'tp';
-  if (r.navy){ tp.textContent = '⚓'; tp.title = 'שובצת בחיל הים'; }
+  if (r.navy && mode === 'eviatar'){ const u = document.createElement('span'); u.className = 'u82'; u.textContent = '8200'; tp.appendChild(u); tp.title = 'שובצת ב־8200'; }
+  else if (r.navy){ tp.textContent = '⚓'; tp.title = 'שובצת בחיל הים'; }
   else if (r.tier >= 0 && r.tier < N){ const cv = document.createElement('canvas'); cv.width = cv.height = 48; drawMini(cv, r.tier, false); tp.appendChild(cv); tp.title = P(r.tier).name; }
   const nm = document.createElement('span'); nm.className = 'nm'; nm.append(r.name);
   if (r.mach){ const mz = document.createElement('bdi'); mz.className = 'mz'; mz.textContent = r.mach === 'אחר' ? 'אחר' : 'מחזור ' + r.mach; nm.append(' - ', mz); }
@@ -2607,12 +2723,12 @@ function renderLb(){
   const full = document.getElementById('lbUl'), mini = document.getElementById('overLb');
   if (!full || !mini) return;
   full.innerHTML = ''; mini.innerHTML = '';
-  lbRows[lbView].forEach((r, i) => full.appendChild(lbItem(r, i, r.key === mine)));
+  lbRows[lbView].forEach((r, i) => full.appendChild(lbItem(r, i, r.key === mine, lbView)));
   document.getElementById('lbNote').textContent = lbNote(lbView);
   document.querySelectorAll('.lbtabs button').forEach(b => b.classList.toggle('sel', b.dataset.m === lbView));
   const rows = lbRows[gameMode] || [], myIdx = rows.findIndex(r => r.key === mine);
-  rows.slice(0, 5).forEach((r, i) => mini.appendChild(lbItem(r, i, r.key === mine)));
-  if (myIdx >= 5){ const g = document.createElement('li'); g.className = 'gap'; g.textContent = '⋯'; mini.appendChild(g); mini.appendChild(lbItem(rows[myIdx], myIdx, true)); }
+  rows.slice(0, 5).forEach((r, i) => mini.appendChild(lbItem(r, i, r.key === mine, gameMode)));
+  if (myIdx >= 5){ const g = document.createElement('li'); g.className = 'gap'; g.textContent = '⋯'; mini.appendChild(g); mini.appendChild(lbItem(rows[myIdx], myIdx, true, gameMode)); }
   document.getElementById('overNote').textContent = lbNote(gameMode);
 }
 document.querySelectorAll('.lbtabs button').forEach(b => b.onclick = () => { lbView = b.dataset.m; renderLb(); });
@@ -2665,7 +2781,7 @@ setInterval(() => {
   teaseNext = simTime + 90 + Math.random()*60;
   const r = Math.random() < 0.6 ? above[above.length - 1] : pick(above), n = who(r), g = Math.max(0, r.score - run.score);
   let line = pick(TEASE)(n, r, g);
-  if (r.navy && !run.navy && Math.random() < 0.4) line = `⚓ ${n} already got drafted and you're still a civilian`;
+  if (r.navy && !run.navy && Math.random() < 0.4) line = gameMode === 'eviatar' ? `💻 ${n} is already in 8200 and you're still a civilian` : `⚓ ${n} already got drafted and you're still a civilian`;
   else if (!r.navy && r.tier > run.tier && r.tier < N && Math.random() < 0.4) line = `👀 ${n} reached ${P(r.tier).name} and you didn't`;
   showToast(line);
 }, 1000);
@@ -2680,7 +2796,7 @@ function buildShare(){
   lines.push(`Biggest lecturer: *${P(Math.min(topTier, N)).name}* 😎`);
   if (isEvi()) lines.push('💀 Survived Eviatar mode');
   if (isHard() && qTotal > 0) lines.push(`Answered ${qRight}/${qTotal} quiz questions before Moed Bet got me 💀`);
-  if (gotSecret) lines.push('⚓ Got drafted: שובצת בחיל הים');
+  if (gotSecret) lines.push(isEvi() ? '💻 Got recruited: שובצת ב־8200' : '⚓ Got drafted: שובצת בחיל הים');
   lines.push('Think you can beat me? 👇', GAME_URL);
   return lines.join('\n');
 }
@@ -2708,13 +2824,13 @@ function askName(change){
   paused = true;
   nameModal.classList.remove('hidden');
 }
-function startTestRun(){
+function startTestRun(mode){
   closeInfo();
   if (!nameModal.classList.contains('hidden')) nameModal.classList.add('hidden');
   endCurrentGame();
-  testMode = true; gameMode = 'normal'; const g = gilaTier(); testQueue = [g, g, g, g];
+  testMode = true; gameMode = mode === 'eviatar' ? 'eviatar' : 'normal'; const g = gilaTier(); testQueue = [g, g, g, g];
   paused = false; newGame();
-  floatText('🧪 TEST RUN: 4 GILAS', W/2, 200, '#ffd43b', 22);
+  floatText(mode === 'eviatar' ? '🧪 EVIATAR TEST: 4 GILAS' : '🧪 TEST RUN: 4 GILAS', W/2, 200, '#ffd43b', 22);
 }
 const tutModal = document.getElementById('tutModal');
 function setPicked(m){
@@ -2767,7 +2883,8 @@ const infoModal = document.getElementById('infoModal');
 document.getElementById('infoBtn').onclick = () => { if (!nameModal.classList.contains('hidden')) return; paused = true; infoModal.classList.remove('hidden'); };
 function closeInfo(){ infoModal.classList.add('hidden'); paused = false; }
 document.getElementById('infoDone').onclick = closeInfo;
-document.getElementById('testBtn').onclick = startTestRun;
+document.getElementById('testBtn').onclick = () => startTestRun('normal');
+document.getElementById('testBtnE').onclick = () => startTestRun('eviatar');
 infoModal.addEventListener('click', e => { if (e.target === infoModal) closeInfo(); });
 
 // secret character: the artifact's owner sets it in the Faces panel and it is shared with every player
