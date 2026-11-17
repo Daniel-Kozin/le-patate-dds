@@ -2440,7 +2440,7 @@ const cleanName = v => (v || '').replace(/\s+/g, ' ').trim().slice(0, 16);
 const userKey = n => 'u_' + Array.from(n.trim().toLowerCase()).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
 const nameModal = document.getElementById('nameModal'), nameIn = document.getElementById('nameIn');
 // ---------- global leaderboard (Firebase) ----------
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {"apiKey": "AIzaSyCyOjxfVO8SY_i2iTSNL9nkgo2iXJuvWWI", "authDomain": "le-patate-dds.firebaseapp.com", "projectId": "le-patate-dds", "storageBucket": "le-patate-dds.firebasestorage.app", "messagingSenderId": "915129683286", "appId": "1:915129683286:web:462ebba03178ae13721af7"};
 const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar'], LB_COLL = m => 'scores_' + m;
 const lbKey = n => 'u_' + Array.from(n.trim().toLowerCase()).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
 let fb = null, lbRows = {normal: [], hard: [], eviatar: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading'}, lbView = 'normal';
