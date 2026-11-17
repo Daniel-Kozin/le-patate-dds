@@ -168,9 +168,18 @@
   .mbox.chalk .qh{color:#ffd43b}
   .mbox.chalk .qdrop{color:#ffc9c9}
   .mbox.chalk .qbar{background:#1a2e22}
-  .mbig{font-family:'Anton',Impact,sans-serif;font-size:min(8.5vw,34px);letter-spacing:1.5px;text-align:center;color:#ffd43b;text-shadow:2px 2px 0 #000;line-height:1.05;margin:0 0 2px}
+  #mwrap.chalkwrap{padding-top:2%}
+  .mbox.chalk{max-height:calc(100% - 10px);overflow-y:auto}
+  .mlabel{font-size:12px;font-weight:800;letter-spacing:1.5px;color:#ffd43b;margin:6px 0 3px;text-align:left}
+  .mbox.chalk .qo.lines{gap:5px}
+  .mbox.chalk .qo.lines button{display:flex;align-items:center;gap:9px;min-height:36px;padding:5px 9px}
+  .stepn{flex:none;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .mbox.chalk .qo.lines button.sel .stepn{background:#ffd43b;color:#24402f}
+  .mbox.chalk .qo.lines button.bad .stepn{background:#ff6b6b}
+  .mbox.chalk .qo.lines button.bad::after{content:'✗ mistake';margin-left:auto;font-size:12px;font-weight:800;color:#ffc9c9}
+  .mbig{font-family:'Anton',Impact,sans-serif;font-size:min(8vw,32px);letter-spacing:1.5px;text-align:center;color:#ffd43b;text-shadow:2px 2px 0 #000;line-height:1.05;margin:0 0 2px}
   .msub{text-align:center;font-size:13px;color:#d3f9d8;margin-bottom:8px}
-  .mbox.chalk .mhead{color:#fff;text-align:center;border-bottom:2px dashed rgba(255,255,255,.35);padding-bottom:6px}
+  .mbox.chalk .mhead{color:#fff;text-align:left;background:rgba(0,0,0,.22);border-radius:10px;padding:7px 10px;margin:0}
   .mbox.chalk .qo.lines button{background:transparent;color:#f8f9fa;box-shadow:none;border:2px dashed rgba(255,255,255,.4);font-family:inherit}
   .mbox.chalk .qo.lines button.sel{background:rgba(255,212,59,.22);border:2px solid #ffd43b}
   .mbox.chalk .qo.lines button.bad{background:rgba(250,82,82,.35);border:2px solid #ff6b6b}
@@ -500,6 +509,7 @@
     <p style="font-size:17px;margin:10px 0 4px">Made by <b>Daniel Kozin</b></p>
     <p style="font-size:15px;margin:0 0 6px;color:#6a5fa0">Inspired by Guy Sokolik</p>
     <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button></p>
+    <p id="testMinis" class="hidden" style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px"><b style="width:100%;font-size:14px">🧪 Try a minigame (Eviatar mode):</b><button class="add" type="button" data-mini="who">🧩 Who's this?</button><button class="add" type="button" data-mini="memory">🃏 Memory</button><button class="add" type="button" data-mini="react">⏱️ Exam starts NOW</button><button class="add" type="button" data-mini="coffee">☕ Coffee</button><button class="add" type="button" data-mini="mistake">🔍 Find the mistake</button><button class="add" type="button" data-mini="type">⌨️ Type the word</button></p>
     <div class="actions"><span style="flex:1"></span><button id="infoDone">Done</button><span style="flex:1"></span></div>
   </div>
 </div>
@@ -2097,7 +2107,7 @@ function typeEnd(ok, timeout){
 // ---------- 🎲 Eviatar minigames ----------
 const mwrap = document.getElementById('mwrap'), mBody = document.getElementById('mBody'), mBar = document.getElementById('mBar');
 let mini = null, miniNext = 0, boostUntil = 0, miniBag = [];
-const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return a; };
+const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return testMode && a.length < 4 ? [...Array(N).keys()] : a; };
 function miniStart(){
   miniNext = simTime + 25 + Math.random()*20;
   if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'mistake']); // precision drop is turned off
@@ -2112,7 +2122,7 @@ function miniStart(){
 }
 function miniOpen(type, title, time){
   mini = {type, time, start: simTime, lastAuto: simTime, done: false, overlay: type !== 'precision'};
-  document.querySelector('#mwrap .mbox').classList.remove('chalk');
+  document.querySelector('#mwrap .mbox').classList.remove('chalk'); mwrap.classList.remove('chalkwrap');
   if (mini.overlay){
     document.getElementById('mTitle').textContent = title;
     document.getElementById('mTime').textContent = Math.ceil(time); mBar.style.width = '100%';
@@ -2183,16 +2193,17 @@ const MINI = {
   mistake(){
     if (!mistakeBag.length) mistakeBag = shuffled(MISTAKES.map((_, i) => i));
     const m = MISTAKES[mistakeBag.pop()];
-    miniOpen('mistake', '🧑‍🏫 TA CHECK', 14);
-    document.querySelector('#mwrap .mbox').classList.add('chalk');
-    const big = el('div', 'mbig', '🔍 FIND THE MISTAKE'), subt = el('div', 'msub', 'One line on the board is wrong. Tap it, then Submit.');
+    miniOpen('mistake', '🧑‍🏫 TA CHECK', 18 + m.s.length);
+    document.querySelector('#mwrap .mbox').classList.add('chalk'); mwrap.classList.add('chalkwrap');
+    const big = el('div', 'mbig', '🔍 FIND THE MISTAKE'), subt = el('div', 'msub', 'A student solved this. ONE step is wrong. Tap it, then Submit.');
     const head = el('div', 'mhead'); head.innerHTML = m.h; // our own file, rendered at build time
     const list = el('div', 'qo lines'), btns = []; let sel = -1;
-    const sub = el('button', 'qsub', 'Submit ✔'); sub.type = 'button'; sub.disabled = true;
+    const sub = el('button', 'qsub', 'Tap the wrong step first'); sub.type = 'button'; sub.disabled = true;
     const why = el('div', 'mwhy');
     m.s.forEach((line, k) => {
-      const b = el('button'); b.type = 'button'; b.innerHTML = line;
-      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sfx.squeak(); };
+      const b = el('button'); b.type = 'button';
+      const txt = el('span'); txt.innerHTML = line; b.append(el('span', 'stepn', String(k + 1)), txt);
+      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sub.textContent = `Step ${k + 1} is wrong ✔`; sfx.squeak(); };
       list.appendChild(b); btns.push(b);
     });
     mini.reveal = () => { btns.forEach(x => x.classList.remove('sel')); btns[m.b].classList.add('bad'); if (sel >= 0 && sel !== m.b) btns[sel].classList.add('sel'); sub.disabled = true; why.innerHTML = '💡 ' + m.w; };
@@ -2202,7 +2213,7 @@ const MINI = {
       if (ok) why.style.color = '#8ce99a';
       miniEnd(ok, ok ? 'SHARP EYES, TA MATERIAL!' : 'MISSED IT');
     };
-    mBody.append(big, subt, head, list, sub, why);
+    mBody.append(big, subt, el('div', 'mlabel', '📋 THE QUESTION'), head, el('div', 'mlabel', "✏️ THE STUDENT'S SOLUTION"), list, sub, why);
   },
   // 🃏 memory pairs
   memory(){
@@ -2885,6 +2896,15 @@ function closeInfo(){ infoModal.classList.add('hidden'); paused = false; }
 document.getElementById('infoDone').onclick = closeInfo;
 document.getElementById('testBtn').onclick = () => startTestRun('normal');
 document.getElementById('testBtnE').onclick = () => startTestRun('eviatar');
+// test any minigame right away in a fresh Eviatar test game
+document.querySelectorAll('#testMinis [data-mini]').forEach(b => b.onclick = () => {
+  const type = b.dataset.mini;
+  startTestRun('eviatar'); testQueue = [];
+  setTimeout(() => {
+    if (mini) miniEnd(null);
+    if (type === 'type') typeStart(); else MINI[type]();
+  }, 700);
+});
 infoModal.addEventListener('click', e => { if (e.target === infoModal) closeInfo(); });
 
 // secret character: the artifact's owner sets it in the Faces panel and it is shared with every player
@@ -2945,7 +2965,7 @@ function buildSecretBox(){
     try{ isOwner = await u.isOwner(); }catch(e){}
   }
   if (!modal.classList.contains('hidden')) buildRows();
-  if (isOwner || location.hash === '#test') document.getElementById('testWrap').classList.remove('hidden');
+  if (isOwner || location.hash === '#test'){ document.getElementById('testWrap').classList.remove('hidden'); document.getElementById('testMinis').classList.remove('hidden'); }
   if (!d) return;
   // the old shared leaderboard is gone: the owner's visit clears its saved scores once
   if (isOwner && !store.get('lupatat-lb-cleared', false)){
