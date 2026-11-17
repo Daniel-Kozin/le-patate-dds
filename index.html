@@ -569,8 +569,8 @@
     <ul class="tut rpage hidden" data-r="minigames">
       <li><span>🎮</span><div><b>No balls, just challenges</b>, one after another, forever: quiz questions, Find the mistake, Who's this?, Memory pairs, The exam starts NOW, Coffee break, Type the word and Recite the lecture.</div></li>
       <li><span>❤️</span><div>You have <b>3 lives</b>. A wrong answer or running out of time costs a life. Lose all 3 and it's over.</div></li>
-      <li><span>⭐</span><div>Every win is <b>+10</b>. Win 5 in a row and every win counts double, 10 in a row triple, and so on.</div></li>
-      <li><span>⚡</span><div>The quiz timer gets shorter the further you get.</div></li>
+      <li><span>⭐</span><div>Your score is <b>how many challenges you got right</b>. Streaks of 5 and 10 set off a party.</div></li>
+      <li><span>⚡</span><div>Every 10 right answers is a new level, and the quiz timer gets shorter.</div></li>
       <li><span>🏆</span><div>It has <b>its own leaderboard</b>.</div></li>
     </ul>
     <div class="actions"><span style="flex:1"></span><button id="rulesDone" type="button">Got it</button></div>
@@ -1064,6 +1064,7 @@ function reset(){
   balls = []; nid = 1; score = 0; cur = spawn(); next = spawn(); aimX = W/2; lastDrop = -1e9;
   dangerTime = 0; over = false; floats = []; parts = []; seenTier = new Set([0,1,2]); comboCount = 0; comboTimer = 0; shake = 0; simTime = 0;
   document.getElementById('over').classList.add('hidden');
+  best = store.get('lupatat-best-' + gameMode, gameMode === 'normal' ? store.get('lupatat-best', 0) : 0);
   bestAtStart = best; topTier = Math.max(cur, next); qRight = 0; qTotal = 0; gotSecret = false;
   hardReset();
   discover(cur); discover(next);
@@ -1071,7 +1072,7 @@ function reset(){
 }
 function updateHud(){
   document.getElementById('score').textContent = score;
-  if (!testMode && score > best){ best = score; store.set('lupatat-best', best); }
+  if (!testMode && score > best){ best = score; store.set('lupatat-best-' + gameMode, best); }
   document.getElementById('best').textContent = best;
   drawMini(nextCv, next);
 }
@@ -2519,28 +2520,71 @@ function setModeTag(){
 // ---------- 🎮 Minigames mode: endless challenges, no balls, 3 lives ----------
 let arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: []};
 const ARC_POOL = ['quiz', 'quiz', 'quiz', 'quiz', 'mistake', 'who', 'memory', 'react', 'coffee', 'type', 'recite'];
+const ARC_CHEER = ['Le patate!', 'Très bien!', 'Magnifique!', 'Incroyable!', 'Bravo!', 'Oui oui oui!', 'C\'est parfait!'];
+const ARC_SAD = ['Oh non!', 'Mon dieu!', 'Catastrophe!', 'Aïe aïe aïe!'];
+// a lecturer's face pops up at the side and cheers (or boos)
+function faceCheer(happy){
+  const t = Math.floor(Math.random()*N), p = P(t);
+  const el = document.createElement('div'), side = Math.random() < 0.5 ? 'l' : 'r';
+  el.className = `meme ${side}`;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 140; cv.className = 'e ' + (happy ? 'bounce' : 'shake');
+  cv.style.width = cv.style.height = '70px'; drawMini(cv, t, false);
+  const c = document.createElement('div'); c.className = 'c'; c.textContent = happy ? `${p.name.split(' ')[0].toUpperCase()}: ${pick(['NICE', 'YES!', 'GENIUS', 'LE PATATE!', 'PROUD OF YOU'])}` : `${p.name.split(' ')[0].toUpperCase()}: ${pick(['REALLY?', 'NOOO', 'MOED BET', 'SEE ME AFTER CLASS'])}`;
+  el.append(cv, c);
+  const r = appEl.getBoundingClientRect(), wide = side === 'l' ? r.left > 175 : window.innerWidth - r.right > 175;
+  el.style.left = (wide ? (side === 'l' ? r.left/2 - 85 : r.right + (window.innerWidth - r.right)/2 - 85) : (side === 'l' ? 4 : window.innerWidth - 174)) + 'px';
+  el.style.top = (55 + Math.random()*25) + '%';
+  fxEl.appendChild(el); setTimeout(() => el.remove(), 2700);
+}
 function arcadeResult(ok){
   arc.n++;
   if (ok){
-    arc.streak++;
-    const mult = 1 + Math.floor((arc.streak - 1)/5), pts = 10*mult;
-    score += pts;
-    floatText(`+${pts}${mult > 1 ? ` 🔥×${mult}` : ''}`, W/2, 170, '#69db7c', 28);
-    sfx.fanfare();
+    arc.streak++; arc.wins = (arc.wins || 0) + 1;
+    score += 1; // one point per challenge you get right
+    floatText(`✔ ${score}`, W/2, 170, '#69db7c', 30);
+    sfx.fanfare(); burst(W/2, 170, '#69db7c', 22);
+    if (Math.random() < 0.55) meme(pick(['big', 'combo2', 'combo3']));
+    if (Math.random() < 0.35) faceCheer(true);
+    if (Math.random() < 0.4) say('arc', pick(ARC_CHEER), 20);
+    if (arc.wins % 3 === 0) profPopup(true);
+    if (arc.streak % 5 === 0){
+      const big = arc.streak % 10 === 0;
+      emojiRain(big ? ['🔥', '🧠', '💯', '👑', '🚀', '⭐'] : ['🔥', '💯', '⭐'], big ? 40 : 22);
+      flashFx(big ? '#ffd43b' : '#69db7c');
+      meme(null, {custom: ['🔥', `${arc.streak} IN A ROW`, 'bounce'], side: 'l', force: true, big: true, top: 30});
+      if (big){ meme(null, {custom: ['👑', 'UNSTOPPABLE', 'pulse'], side: 'r', force: true, big: true, top: 30}); airhorn(); say('arc', `${arc.streak} d'affilée! Le patate!`, 60); }
+    }
+    if (arc.wins % 10 === 0){ floatText(`LEVEL ${arc.wins/10 + 1} · FASTER`, W/2, 230, '#ffd43b', 24); ringFx('#ffd43b'); }
   } else {
     arc.streak = 0; arc.lives--;
     floatText(arc.lives > 0 ? `💔 ${arc.lives} ${arc.lives === 1 ? 'LIFE' : 'LIVES'} LEFT` : '💔 OUT OF LIVES', W/2, 170, '#ff6b6b', 26);
-    shake = 12; blip({type: 'sawtooth', f0: 160, f1: 60, dur: 0.6, vol: 0.18}); angryProf(false);
+    shake = 14; flashFx('#ff6b6b'); blip({type: 'sawtooth', f0: 160, f1: 60, dur: 0.6, vol: 0.18}); angryProf(false);
+    emojiRain(['💀', '📉', '😭'], 10);
+    meme('danger', {force: true});
+    if (Math.random() < 0.5) faceCheer(false);
+    say('arc', pick(ARC_SAD), 30);
+    if (arc.lives === 1) setTimeout(() => meme(null, {custom: ['🚨', 'LAST LIFE', 'pulse'], side: 'r', force: true, big: true, top: 40}), 900);
     if (arc.lives <= 0) arc.dead = true;
   }
   setModeTag(); updateHud();
+}
+// side stuff between challenges, so the screen never feels empty
+function arcadeSideTick(){
+  if (simTime >= zhNext){ zhNext = simTime + ZH_EVERY; sayChinese(); }
+  if (simTime >= (arc.sideNext || 8)){
+    arc.sideNext = simTime + 9 + Math.random()*8;
+    const r = Math.random();
+    if (r < 0.4) faceCheer(true);
+    else if (r < 0.7) meme(null, {custom: pick([['☕', 'COFFEE BREAK SOON', 'bounce'], ['📚', 'STUDY HARDER', 'pulse'], ['🥔', 'LE PATATE', 'spin'], ['🧠', 'BRAIN LOADING', 'pulse'], ['📝', 'MOED A ENERGY', 'bounce'], ['😎', 'EASY', 'pulse'], ['🫠', 'MELTING', 'shake'], ['🎓', 'ALMOST GRADUATED', 'bounce']])});
+    else say('arc', pick(['Le patate!', 'Allez allez!', 'Concentration!', 'Encore une!']), 5);
+  }
 }
 function arcadeStartNext(){
   if (!arc.started){ arc.started = true; logEntry({t: 'start', mode: gameMode}); }
   if (!arc.bag.length) arc.bag = shuffled(ARC_POOL);
   for (let tries = 0; tries < 6; tries++){
     const type = arc.bag.pop() || 'quiz';
-    if (type === 'quiz'){ if (!QUESTIONS) continue; openQuestion(); qActive.time = Math.max(7, 12 - Math.floor(arc.n/10)); return; }
+    if (type === 'quiz'){ if (!QUESTIONS) continue; openQuestion(); qActive.time = Math.max(7, 12 - Math.floor((arc.wins || 0)/10)); return; }
     if (type === 'type'){ typeStart(); return; }
     if (type === 'recite'){ reciteStart(); if (recite) return; continue; }
     if (type === 'mistake' && !MISTAKES.length) continue;
@@ -2557,6 +2601,7 @@ function arcadeTick(){
   if (mini) miniTick();
   if (typing) typeTick();
   if (recite) reciteTick();
+  arcadeSideTick();
   const busy = qActive || mini || typing || recite || !rwrap.classList.contains('hidden');
   if (busy){ arc.idle = -1; return; }
   if (arc.idle < 0){ arc.idle = simTime; return; }
@@ -2572,7 +2617,7 @@ function drawArcade(){
   ctx.fillStyle = '#087f5b'; ctx.font = '700 30px Fredoka, sans-serif'; ctx.fillText('MINIGAMES', W/2, H*0.3 + 62);
   ctx.font = '34px sans-serif'; ctx.fillText('❤️'.repeat(Math.max(0, arc.lives)) + '🖤'.repeat(Math.max(0, 3 - arc.lives)), W/2, H*0.5);
   ctx.fillStyle = '#2b1d5c'; ctx.font = '700 22px Fredoka, sans-serif';
-  ctx.fillText(`Challenge ${arc.n + 1}`, W/2, H*0.6);
+  ctx.fillText(`${score} right · challenge ${arc.n + 1}`, W/2, H*0.6);
   if (arc.streak >= 2){ ctx.fillStyle = '#e8590c'; ctx.fillText(`🔥 ${arc.streak} in a row`, W/2, H*0.6 + 34); }
   ctx.restore();
 }
@@ -2825,7 +2870,7 @@ const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar', 'minigames'],
 const lbKey = (n, mz) => 'u_' + Array.from(n.trim().toLowerCase() + (mz ? '~~' + mz : '')).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
 const MACH = ['ה', 'ו', 'ז', 'ח', 'ט', 'אחר'];
 const LB_MAX = 1000000;
-const lbRank = r => [r.navy ? 1 : 0, r.tier, r.score];
+const lbRank = r => [r.score, r.navy ? 1 : 0, r.tier]; // the highest score in a single game wins
 const lbCmp = (a, b) => { const x = lbRank(a), y = lbRank(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return y[i] - x[i]; return 0; };
 let fb = null, lbRows = {normal: [], hard: [], eviatar: [], minigames: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading', minigames: 'loading'}, lbView = 'eviatar';
 const fbReady = (async () => {
@@ -2847,7 +2892,7 @@ const fbReady = (async () => {
   }catch(e){ LB_MODES.forEach(m => lbState[m] = 'error'); renderLb(); return null; }
 })();
 // a player's entry keeps only their best score in that mode
-// a player's entry keeps only their best run in that mode: drafted first, then biggest lecturer, then score
+// a player's entry keeps their highest-scoring game in that mode (with that game's biggest lecturer)
 async function lbSave(name, mach, mode, run){
   const F = await fbReady; if (!F) return {ok: false};
   const {fs, db} = F, ref = fs.doc(db, LB_COLL(mode), lbKey(name, mach));
@@ -2956,18 +3001,22 @@ function logGameEnd(end){
   if (over && end !== 'time' && end !== 'top' && end !== 'lives') return; // already over (and already logged)
   if (gameLogged || testMode || !gstats || ((isArcade() ? arc.n < 2 : gstats.drops < 3) && (end === 'restart' || end === 'closed'))) return;
   gameLogged = true;
-  logEntry({t: 'game', mode: gameMode, end, score: Math.max(0, Math.floor(score)), tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), navy: !!gotSecret,
+  logEntry({t: 'game', mode: gameMode, end, score: Math.max(0, Math.floor(score)), tier: isArcade() ? 0 : gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), navy: !!gotSecret,
     dur: Math.round(simTime), drops: gstats.drops, merges: gstats.merges, qok: qRight, qn: qTotal, mok: gstats.miniOk, mbad: gstats.miniBad, tok: gstats.typeOk, tbad: gstats.typeBad});
 }
 window.addEventListener('pagehide', () => { if (!over) logGameEnd('closed'); });
 
 // ---------- admin panel (test mode only) ----------
 const adminModal = document.createElement('div'); adminModal.id = 'adminModal'; adminModal.className = 'modal hidden';
-adminModal.innerHTML = '<div class="panel adm"><div class="admhead"><h3>📊 Admin panel</h3><span style="flex:1"></span><button type="button" class="ghost" id="admRefresh">↻ Refresh</button><button type="button" id="admClose">Close</button></div><div id="admBody">Loading…</div></div>';
+adminModal.innerHTML = '<div class="panel adm"><div class="admhead"><h3>📊 Admin panel</h3><span style="flex:1"></span><button type="button" class="ghost" id="admRefresh">↻ Refresh</button><button type="button" class="ghost" id="admTools">🧪 Test tools</button><button type="button" id="admClose">🎮 Play</button></div><div id="admBody">Loading…</div></div>';
 document.body.appendChild(adminModal);
-document.getElementById('admClose').onclick = () => { adminModal.classList.add('hidden'); paused = false; };
+// closing the panel goes to the normal start screen
+document.getElementById('admClose').onclick = () => { adminModal.classList.add('hidden'); askName(); };
+document.getElementById('admTools').onclick = () => { adminModal.classList.add('hidden'); paused = true; infoModal.classList.remove('hidden'); };
+// the test site (#test) opens on the admin panel instead of the start screen
+if (location.hash === '#test') setTimeout(() => { nameModal.classList.add('hidden'); openAdmin(); }, 50);
 document.getElementById('admRefresh').onclick = () => loadAdmin();
-adminModal.addEventListener('click', e => { if (e.target === adminModal){ adminModal.classList.add('hidden'); paused = false; } });
+adminModal.addEventListener('click', e => { if (e.target === adminModal){ adminModal.classList.add('hidden'); askName(); } });
 function openAdmin(){ closeInfo(); paused = true; adminModal.classList.remove('hidden'); loadAdmin(); }
 { const ab = document.getElementById('adminBtn'); if (ab) ab.onclick = openAdmin; }
 const MODE_NAME = {normal: 'Normal', hard: 'Hard', eviatar: 'Eviatar', minigames: 'Minigames'};
