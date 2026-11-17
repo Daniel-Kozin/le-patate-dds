@@ -113,6 +113,11 @@
   .lbtabs{display:flex;gap:6px;margin:6px 0 8px}
   .lbtabs button{flex:1;background:#ece9f5;color:#4a4070;box-shadow:none;border:2px solid transparent;font-size:14px;padding:8px 4px}
   .lbtabs button.sel{border-color:#7950f2;background:#efe9ff;color:#2b1d5c}
+  .ltoast{position:fixed;left:50%;top:64px;transform:translate(-50%,-20px);opacity:0;z-index:60;pointer-events:none;max-width:min(92vw,360px);
+    background:#2b1d5c;color:#fff;border:3px solid #ffd43b;border-radius:14px;padding:9px 14px;font-size:15px;font-weight:600;text-align:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);transition:opacity .25s,transform .25s}
+  .ltoast.show{opacity:1;transform:translate(-50%,0)}
+  .ltoast.win{border-color:#69db7c;background:#1b4332}
   .share{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   .share .wa,.share button{font-family:inherit;font-weight:700;font-size:16px;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;text-decoration:none}
   .share .wa{background:#25d366;color:#fff;box-shadow:0 3px 0 #128c4a}
@@ -157,6 +162,11 @@
   .qsub:disabled{background:#dee2e6;color:#868e96;box-shadow:none;cursor:default}
   .qo button.ok{background:#8ce99a;box-shadow:0 3px 0 #2f9e44}
   .qo button.bad{background:#ffa8a8;box-shadow:0 3px 0 #e03131}
+  .qo.lines{grid-template-columns:1fr}
+  .qo.lines button{text-align:left;padding:7px 10px;min-height:40px}
+  .mhead{font-weight:700;font-size:16px;margin:2px 0 8px;color:#2b1d5c}
+  .mhead math,.mwhy math{font-size:1.1em}
+  .mwhy{font-size:14px;color:#c92a2a;font-weight:600;margin-top:6px;min-height:0}
   .qbar{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-top:9px}
   .qbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#fa5252,#ffd43b)}
   .qdrop{font-size:12px;color:#c92a2a;text-align:center;margin-top:5px;font-weight:700}
@@ -445,7 +455,7 @@
       <li><span>👀</span><div><b>Questions about your board:</b> "How many Omers are on the board?" You get 5 seconds.</div></li>
       <li><span>🧠</span><div><b>Recite the lecture:</b> 5 faces flash, then tap them in the same order in the strip under the board.</div></li>
       <li><span>⌨️</span><div><b>Type the word:</b> a nasty long word pops up. Type it exactly before the timer runs out (half a second per letter, plus 1.5 seconds). Wrong or too slow counts as a wrong answer.</div></li>
-      <li><span>🎲</span><div><b>Random minigames</b> (the game keeps running!): 🧩 Who's this?, 🃏 Memory pairs, ⏱️ The exam starts NOW (tap on green, not before), ☕ Coffee break (tap fast for turbo drops) and 🎯 Precision drop.</div></li>
+      <li><span>🎲</span><div><b>Random minigames</b> (the game keeps running!): 🧩 Who's this?, 🃏 Memory pairs, ⏱️ The exam starts NOW (tap on green, not before), ☕ Coffee break (tap fast for turbo drops), 🔍 Find the mistake (tap the wrong line of a derivation) and 🎯 Precision drop.</div></li>
       <li><span>💣</span><div><b>Bomb ball:</b> merge it within 15 seconds or it blows up everything it touches.</div></li>
       <li><span>🧱</span><div><b>Midterm wall:</b> every 20 balls, a bar blocks the middle of the board for the next 35 balls.</div></li>
       <li><span>🕶️</span><div><b>He's watching:</b> don't drop for 5 seconds and Eviatar drops one for you.</div></li>
@@ -1963,11 +1973,12 @@ let mini = null, miniNext = 0, boostUntil = 0, miniBag = [];
 const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return a; };
 function miniStart(){
   miniNext = simTime + 25 + Math.random()*20;
-  if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'precision']);
+  if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'precision', 'mistake']);
   for (let tries = 0; tries < 5; tries++){
     const type = miniBag.pop() || 'react';
     if (type === 'who' && seenTiers().length < 4) continue;
     if (type === 'memory' && seenTiers().length < 2) continue;
+    if (type === 'mistake' && !MISTAKES.length) continue;
     MINI[type](); return;
   }
   MINI.react();
@@ -2008,7 +2019,8 @@ function miniEnd(ok, msg){
   }
   updateHud();
   const wasOverlay = mini.overlay;
-  setTimeout(() => { mini = null; if (wasOverlay){ mwrap.classList.add('hidden'); mBody.innerHTML = ''; } }, wasOverlay ? (ok ? 1000 : 1700) : 0);
+  const hold = ok ? 1000 : (mini.type === 'mistake' ? 3200 : 1700);
+  setTimeout(() => { mini = null; if (wasOverlay){ mwrap.classList.add('hidden'); mBody.innerHTML = ''; } }, wasOverlay ? hold : 0);
 }
 const el = (tag, cls, txt) => { const d = document.createElement(tag); if (cls) d.className = cls; if (txt != null) d.textContent = txt; return d; };
 const MINI = {
@@ -2038,6 +2050,29 @@ const MINI = {
     };
     mBody.append(cv, grid, sub);
     mini.tick = () => { const f = Math.max(0, 2 - (simTime - mini.start)/3); cv.style.filter = `blur(${f}px)`; };
+  },
+  // 🔍 find the mistake: tap the wrong line of a derivation, then Submit
+  mistake(){
+    if (!mistakeBag.length) mistakeBag = shuffled(MISTAKES.map((_, i) => i));
+    const m = MISTAKES[mistakeBag.pop()];
+    miniOpen('mistake', '🔍 FIND THE MISTAKE', 14);
+    const head = el('div', 'mhead'); head.innerHTML = m.h; // our own file, rendered at build time
+    const list = el('div', 'qo lines'), btns = []; let sel = -1;
+    const sub = el('button', 'qsub', 'Submit ✔'); sub.type = 'button'; sub.disabled = true;
+    const why = el('div', 'mwhy');
+    m.s.forEach((line, k) => {
+      const b = el('button'); b.type = 'button'; b.innerHTML = line;
+      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sfx.squeak(); };
+      list.appendChild(b); btns.push(b);
+    });
+    mini.reveal = () => { btns.forEach(x => x.classList.remove('sel')); btns[m.b].classList.add('bad'); if (sel >= 0 && sel !== m.b) btns[sel].classList.add('sel'); sub.disabled = true; why.innerHTML = '💡 ' + m.w; };
+    sub.onclick = () => {
+      if (sel < 0 || !mini || mini.done) return;
+      const ok = sel === m.b; mini.reveal();
+      if (ok) why.style.color = '#2f9e44';
+      miniEnd(ok, ok ? 'SHARP EYES, TA MATERIAL!' : 'MISSED IT');
+    };
+    mBody.append(head, list, sub, why);
   },
   // 🃏 memory pairs
   memory(){
@@ -2219,6 +2254,8 @@ const MODE = {
 const cfg = () => MODE[gameMode] || MODE.hard;
 const challenge = () => !!(qActive || recite || typing); // a quiz, a recite or a typing test is on screen
 let QUESTIONS = null;
+let MISTAKES = [], mistakeBag = [];
+fetch('mistakes.json').then(r => r.ok ? r.json() : null).then(v => { if (Array.isArray(v) && v.length) MISTAKES = v; }).catch(() => {});
 fetch('questions.json').then(r => r.ok ? r.json() : null).then(v => { if (Array.isArray(v) && v.length) QUESTIONS = v; }).catch(() => {});
 let gameMode = 'normal', pickedMode = ['hard', 'eviatar'].includes(store.get('lupatat-mode', 'normal')) ? store.get('lupatat-mode', 'normal') : 'normal';
 let qActive = null, qDrops = 0, qStart = 0, qLastAuto = 0, qBag = [];
@@ -2569,6 +2606,54 @@ document.getElementById('lbBtn').onclick = () => { if (!nameModal.classList.cont
 function closeLb(){ lbModal.classList.add('hidden'); paused = false; }
 document.getElementById('lbDone').onclick = closeLb;
 lbModal.addEventListener('click', e => { if (e.target === lbModal) closeLb(); });
+
+// ---------- live teasing: whoever is above you on the board lets you know ----------
+const ltoast = document.createElement('div'); ltoast.className = 'ltoast'; document.body.appendChild(ltoast);
+let ltoastT = 0;
+function showToast(text, win){
+  ltoast.textContent = text; ltoast.dir = 'auto'; ltoast.classList.toggle('win', !!win); ltoast.classList.add('show');
+  blip({type: 'triangle', f0: win ? 990 : 520, f1: win ? 1480 : 390, dur: 0.18, vol: 0.06});
+  clearTimeout(ltoastT); ltoastT = setTimeout(() => ltoast.classList.remove('show'), 3800);
+}
+const who = r => '\u2068' + r.name + '\u2069' + (r.mach && r.mach !== 'אחר' ? ` - \u2068מחזור ${r.mach}\u2069` : '');
+const TEASE = [
+  (n, r, g) => `😏 ${n}: "still under me?"`,
+  (n, r, g) => `😂 ${n} is ${g} points ahead and laughing`,
+  (n, r, g) => `📞 ${n} says Moed Bet is calling you`,
+  (n, r, g) => `🙄 ${n}: "נו באמת?"`,
+  (n, r, g) => `🥱 ${n} wants to know if you're even trying`,
+  (n, r, g) => `😴 ${n}: "I got that score half asleep"`,
+  (n, r, g) => `😇 ${n}: "צנזור likes me more"`,
+  (n, r, g) => `📱 ${n} just sent you a "?" on WhatsApp`,
+  (n, r, g) => `📚 ${n}: "תלמד קצת לפני שאתה בא"`,
+  (n, r, g) => `🤷 ${n} is ahead of you. Just saying.`,
+  (n, r, g) => `🍿 ${n} is watching you play and eating popcorn`,
+  (n, r, g) => `🧑‍🏫 ${n}: "want me to tutor you?"`,
+];
+const PASSED = [n => `🔥 You just passed ${n}!`, n => `👋 Bye bye ${n}`, n => `😭 ${n} is crying now. You passed them!`];
+let teaseNext = 15, teaseLast = -1, teaseAbove = null;
+const liveRun = () => ({navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))});
+setInterval(() => {
+  if (testMode || over || paused || lbState[gameMode] !== 'ok') return;
+  if (simTime < teaseLast){ teaseNext = 15; teaseAbove = null; } // a new game started
+  if (simTime === teaseLast) return; // not running
+  teaseLast = simTime;
+  const mine = username ? lbKey(username, store.get('lupatat-machzor', '')) : null, run = liveRun();
+  const others = (lbRows[gameMode] || []).filter(r => r.key !== mine);
+  const above = others.filter(r => lbCmp(r, run) < 0), aboveKeys = new Set(above.map(r => r.key));
+  if (teaseAbove){
+    const gone = others.find(r => teaseAbove.has(r.key) && !aboveKeys.has(r.key));
+    if (gone){ teaseAbove = aboveKeys; showToast(pick(PASSED)(who(gone)), true); teaseNext = Math.max(teaseNext, simTime + 8); return; }
+  }
+  teaseAbove = aboveKeys;
+  if (simTime < teaseNext || !above.length) return;
+  teaseNext = simTime + 20 + Math.random()*25;
+  const r = Math.random() < 0.6 ? above[above.length - 1] : pick(above), n = who(r), g = Math.max(0, r.score - run.score);
+  let line = pick(TEASE)(n, r, g);
+  if (r.navy && !run.navy && Math.random() < 0.4) line = `⚓ ${n} already got drafted and you're still a civilian`;
+  else if (!r.navy && r.tier > run.tier && r.tier < N && Math.random() < 0.4) line = `👀 ${n} reached ${P(r.tier).name} and you didn't`;
+  showToast(line);
+}, 1000);
 
 // ---------- share your score ----------
 const GAME_URL = 'https://daniel-kozin.github.io/le-patate-dds/';
