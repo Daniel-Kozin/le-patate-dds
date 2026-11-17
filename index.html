@@ -163,6 +163,17 @@
   .qo button.ok{background:#8ce99a;box-shadow:0 3px 0 #2f9e44}
   .qo button.bad{background:#ffa8a8;box-shadow:0 3px 0 #e03131}
   .qo.lines{grid-template-columns:1fr}
+  .mbox.chalk{background:#24402f;color:#f1f3f5;border:7px solid #8a5a2b;box-shadow:0 8px 0 rgba(0,0,0,.3),inset 0 0 30px rgba(0,0,0,.35)}
+  .mbox.chalk .qh{color:#ffd43b}
+  .mbox.chalk .qdrop{color:#ffc9c9}
+  .mbox.chalk .qbar{background:#1a2e22}
+  .mbig{font-family:'Anton',Impact,sans-serif;font-size:min(8.5vw,34px);letter-spacing:1.5px;text-align:center;color:#ffd43b;text-shadow:2px 2px 0 #000;line-height:1.05;margin:0 0 2px}
+  .msub{text-align:center;font-size:13px;color:#d3f9d8;margin-bottom:8px}
+  .mbox.chalk .mhead{color:#fff;text-align:center;border-bottom:2px dashed rgba(255,255,255,.35);padding-bottom:6px}
+  .mbox.chalk .qo.lines button{background:transparent;color:#f8f9fa;box-shadow:none;border:2px dashed rgba(255,255,255,.4);font-family:inherit}
+  .mbox.chalk .qo.lines button.sel{background:rgba(255,212,59,.22);border:2px solid #ffd43b}
+  .mbox.chalk .qo.lines button.bad{background:rgba(250,82,82,.35);border:2px solid #ff6b6b}
+  .mbox.chalk .mwhy{color:#ffd8a8}
   .qo.lines button{text-align:left;padding:7px 10px;min-height:40px}
   .mhead{font-weight:700;font-size:16px;margin:2px 0 8px;color:#2b1d5c}
   .mhead math,.mwhy math{font-size:1.1em}
@@ -974,8 +985,9 @@ function emojiRain(list, n = 36){
 let lastActionAt = 0, idleShown = false, dangerShown = false;
 
 const DROP_GAP = 0.3; // seconds between drops
+const boardFrozen = () => !!(qActive && qActive.board && !qActive.done);
 function drop(force){
-  if (over || (!force && (paused || challenge() || simTime < mossadLockUntil || simTime - lastDrop < (simTime < boostUntil ? 0.12 : DROP_GAP)))) return; // no manual drops during a quiz or the Mossad
+  if (over || boardFrozen() || (!force && (paused || challenge() || simTime < mossadLockUntil || simTime - lastDrop < (simTime < boostUntil ? 0.12 : DROP_GAP)))) return; // no manual drops during a quiz or the Mossad
   lastDrop = simTime;
   const r = RADII[cur];
   const x = Math.max(wallIn + r, Math.min(W - wallIn - r, aimX));
@@ -1212,7 +1224,7 @@ function mergePair(a, b){
   }
 }
 function step(){
-  const frozen = simTime < cfUntil; // ceasefire: nothing moves
+  const frozen = simTime < cfUntil || boardFrozen(); // nothing moves (and the count can't change) during the board question
   for (let s = 0; s < SUB && !frozen; s++){
     for (const b of balls){
       if (b.locked){ b.px = b.x; b.py = b.y; continue; }
@@ -1985,6 +1997,7 @@ function miniStart(){
 }
 function miniOpen(type, title, time){
   mini = {type, time, start: simTime, lastAuto: simTime, done: false, overlay: type !== 'precision'};
+  document.querySelector('#mwrap .mbox').classList.remove('chalk');
   if (mini.overlay){
     document.getElementById('mTitle').textContent = title;
     document.getElementById('mTime').textContent = Math.ceil(time); mBar.style.width = '100%';
@@ -2055,7 +2068,9 @@ const MINI = {
   mistake(){
     if (!mistakeBag.length) mistakeBag = shuffled(MISTAKES.map((_, i) => i));
     const m = MISTAKES[mistakeBag.pop()];
-    miniOpen('mistake', '🔍 FIND THE MISTAKE', 14);
+    miniOpen('mistake', '🧑‍🏫 TA CHECK', 14);
+    document.querySelector('#mwrap .mbox').classList.add('chalk');
+    const big = el('div', 'mbig', '🔍 FIND THE MISTAKE'), subt = el('div', 'msub', 'One line on the board is wrong. Tap it, then Submit.');
     const head = el('div', 'mhead'); head.innerHTML = m.h; // our own file, rendered at build time
     const list = el('div', 'qo lines'), btns = []; let sel = -1;
     const sub = el('button', 'qsub', 'Submit ✔'); sub.type = 'button'; sub.disabled = true;
@@ -2069,10 +2084,10 @@ const MINI = {
     sub.onclick = () => {
       if (sel < 0 || !mini || mini.done) return;
       const ok = sel === m.b; mini.reveal();
-      if (ok) why.style.color = '#2f9e44';
+      if (ok) why.style.color = '#8ce99a';
       miniEnd(ok, ok ? 'SHARP EYES, TA MATERIAL!' : 'MISSED IT');
     };
-    mBody.append(head, list, sub, why);
+    mBody.append(big, subt, head, list, sub, why);
   },
   // 🃏 memory pairs
   memory(){
@@ -2307,12 +2322,12 @@ function boardQuestion(){
   const opts = [c];
   for (const d of shuffled([1, -1, 2, -2, 3])){ if (opts.length < 4 && c + d >= 0 && !opts.includes(c + d)) opts.push(c + d); }
   while (opts.length < 4) opts.push(Math.max(...opts) + 1);
-  return {s: '👀 Your board', q: `How many <b>${escHtml(P(t).name)}</b> are on the board right now?`, o: opts.map(String), time: 5};
+  return {s: '👀 Your board (frozen ❄️)', q: `How many <b>${escHtml(P(t).name)}</b> are on the board right now?`, o: opts.map(String), time: 5};
 }
 function openQuestion(opts = {}){
   if (!qBag.length) qBag = shuffled(QUESTIONS.map((_, i) => i));
   let q = null;
-  if (!opts.exam && isEvi() && Math.random() < 0.35) q = boardQuestion();
+  if (!opts.exam && isEvi() && Math.random() < 0.07) q = boardQuestion();
   if (!q) q = QUESTIONS[qBag.pop()];
   const order = shuffled([0, 1, 2, 3]);
   qActive = {correct: order.indexOf(0), done: false, btns: [], sel: -1, time: q.time || cfg().qTime, exam: opts.exam || 0, board: !!q.time};
@@ -2631,11 +2646,11 @@ const TEASE = [
   (n, r, g) => `🧑‍🏫 ${n}: "want me to tutor you?"`,
 ];
 const PASSED = [n => `🔥 You just passed ${n}!`, n => `👋 Bye bye ${n}`, n => `😭 ${n} is crying now. You passed them!`];
-let teaseNext = 15, teaseLast = -1, teaseAbove = null;
+let teaseNext = 60, teaseLast = -1, teaseAbove = null;
 const liveRun = () => ({navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))});
 setInterval(() => {
   if (testMode || over || paused || lbState[gameMode] !== 'ok') return;
-  if (simTime < teaseLast){ teaseNext = 15; teaseAbove = null; } // a new game started
+  if (simTime < teaseLast){ teaseNext = 60; teaseAbove = null; } // a new game started
   if (simTime === teaseLast) return; // not running
   teaseLast = simTime;
   const mine = username ? lbKey(username, store.get('lupatat-machzor', '')) : null, run = liveRun();
@@ -2647,7 +2662,7 @@ setInterval(() => {
   }
   teaseAbove = aboveKeys;
   if (simTime < teaseNext || !above.length) return;
-  teaseNext = simTime + 20 + Math.random()*25;
+  teaseNext = simTime + 90 + Math.random()*60;
   const r = Math.random() < 0.6 ? above[above.length - 1] : pick(above), n = who(r), g = Math.max(0, r.score - run.score);
   let line = pick(TEASE)(n, r, g);
   if (r.navy && !run.navy && Math.random() < 0.4) line = `⚓ ${n} already got drafted and you're still a civilian`;
