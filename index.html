@@ -27,6 +27,12 @@
   .overlay h2{margin:0;font-size:36px;color:#ff6b6b;text-shadow:2px 2px 0 #000}
   .overlay p{margin:0;font-size:18px}
   .hidden{display:none!important}
+  .rtabs{display:flex;gap:6px;margin:6px 0 4px}
+  .rtabs button{flex:1;font-family:inherit;font-size:15px;font-weight:700;padding:8px 4px;border-radius:12px;border:2px solid #e5dbff;background:#f8f6ff;color:#2b1d5c;box-shadow:none}
+  .rtabs button.sel{background:#7950f2;color:#fff;border-color:#7950f2}
+  .tut .rnote div{font-weight:700;color:#6a5fa0}
+  .modehint{font-size:13px;color:#6a5fa0;margin:6px 0 0;line-height:1.35}
+  .linkbtn{background:none;border:0;box-shadow:none;padding:0 2px;font:inherit;font-weight:800;color:#7950f2;text-decoration:underline;cursor:pointer}
   #chain{display:flex;align-items:flex-start;justify-content:center;gap:2px;flex-wrap:wrap;width:100%}
   .link{display:flex;flex-direction:column;align-items:center;width:54px;font-size:10px;line-height:1.1;text-align:center;opacity:.95}
   .link canvas{width:36px;height:36px}
@@ -105,6 +111,10 @@
   .lb .nm{direction:ltr;text-align:left}
   .overlay .savebox{flex-wrap:wrap}
   .overlay .savebox button{flex:1 1 100%}
+  #saveBtn{font-family:inherit;font-size:21px;font-weight:900;letter-spacing:.5px;padding:13px 10px;border-radius:16px;
+    background:linear-gradient(#ffe066,#fab005);color:#2b1d5c;border:3px solid #2b1d5c;box-shadow:0 5px 0 #2b1d5c,0 0 0 0 rgba(255,212,59,.7);animation:savePulse 1.4s ease-in-out infinite}
+  #saveBtn:disabled{animation:none;opacity:.75}
+  @keyframes savePulse{0%,100%{box-shadow:0 5px 0 #2b1d5c,0 0 0 0 rgba(255,212,59,.75)}50%{box-shadow:0 5px 0 #2b1d5c,0 0 0 10px rgba(255,212,59,0)}}
   .idrow{display:flex;gap:8px;margin-top:6px}
   .idrow input{flex:1;min-width:0;font-family:inherit;font-size:16px;font-weight:600;padding:8px 10px;border:2px solid #cfc5ff;border-radius:12px;background:#fff;color:#2b1d5c}
   #overNameIn[readonly],#machIn:disabled{opacity:1;background:#f3f0ff;color:#2b1d5c;border-color:#e5dbff}
@@ -482,7 +492,7 @@
       <div class="savebox">
         <input id="overNameIn" class="nameIn" type="text" maxlength="16" placeholder="Your name" spellcheck="false" autocomplete="off">
         <select id="machIn" class="machIn" title="מחזור"><option value="">מחזור?</option><option value="ה">מחזור ה</option><option value="ו">מחזור ו</option><option value="ז">מחזור ז</option><option value="ח">מחזור ח</option><option value="ט">מחזור ט</option><option value="אחר">אחר</option></select>
-        <button id="saveBtn" type="button" class="hidden">💾 Save score</button>
+        <button id="saveBtn" type="button" class="hidden">💾 SAVE MY SCORE</button>
       </div>
       <div class="copied" id="saveNote"></div>
       <div class="olb"><ul class="lb" id="overLb"></ul><div class="lbnote" id="overNote"></div></div>
@@ -520,8 +530,40 @@
     <div class="idrow"><input id="idName" type="text" maxlength="16" placeholder="Your name" autocomplete="nickname" spellcheck="false"><select id="idMach" class="machIn" title="מחזור"><option value="">מחזור?</option><option value="ה">מחזור ה</option><option value="ו">מחזור ו</option><option value="ז">מחזור ז</option><option value="ח">מחזור ח</option><option value="ט">מחזור ט</option><option value="אחר">אחר</option></select></div>
     <h3 style="margin-top:12px">Pick a mode</h3>
     <div class="modes"><button type="button" id="modeN">😊 Normal</button><button type="button" id="modeH" class="hard">🔥 Hard</button><button type="button" id="modeE" class="evi">💀 Eviatar</button></div>
+    <p class="modehint"><span id="modeSum"></span> <button type="button" id="rulesLink" class="linkbtn">📖 Rules</button></p>
     <div class="warn" id="nameWarn"></div>
     <div class="actions"><span style="flex:1"></span><button id="nameGo" class="add">Play!</button></div>
+  </div>
+</div>
+
+<div id="rulesModal" class="modal hidden">
+  <div class="panel">
+    <h3>📖 How to play</h3>
+    <div class="rtabs"><button type="button" data-r="normal" class="sel">😊 Normal</button><button type="button" data-r="hard">🔥 Hard</button><button type="button" data-r="eviatar">💀 Eviatar</button></div>
+    <ul class="tut rpage" data-r="normal">
+      <li><span>👆</span><div><b>Drop lecturers</b> into the board. Two of the same <b>merge</b> into the next, bigger one.</div></li>
+      <li><span>⭐</span><div>Every merge gives points, and <b>bigger merges give more</b>.</div></li>
+      <li><span>🔴</span><div>Don't let the pile stay above the <b>dashed line</b> at the top, or it's <b>Moed Bet</b> (game over).</div></li>
+      <li><span>🤫</span><div>Merge <b>two Oren Kurlands</b> to meet the secret character. The board resets but your score keeps going.</div></li>
+    </ul>
+    <ul class="tut rpage hidden" data-r="hard">
+      <li class="rnote"><div>Everything from Normal, plus:</div></li>
+      <li><span>⏰</span><div><b>Pop quiz every 25 balls</b>, 4 choices, <b>15 seconds</b>. While it's open, a ball drops every 3 seconds.</div></li>
+      <li><span>✅</span><div>Right: <b>+25</b>. Wrong: <b>−50</b>, your biggest lecturer <b>drops a level</b> and your score is <b>frozen for 10 seconds</b>.</div></li>
+      <li><span>🐢</span><div>A <b>turtle</b> pops up at random. Tap it within <b>3 seconds</b> or you lose your biggest lecturer.</div></li>
+      <li><span>📚</span><div><b>Locked in the library:</b> two balls get chained. Tap the 🔒 <b>10 times</b> to break it.</div></li>
+      <li><span>📝</span><div><b>Moed A:</b> 10 small balls drop at once.</div></li>
+    </ul>
+    <ul class="tut rpage hidden" data-r="eviatar">
+      <li class="rnote"><div>Everything from Hard, plus:</div></li>
+      <li><span>⏰</span><div><b>Exam clock:</b> you start with 30 seconds. Merges and right answers add time. At zero: <b>pens down</b>, game over.</div></li>
+      <li><span>📏</span><div><b>Narrow board:</b> wrong answers squeeze it a lot, right answers widen it a little.</div></li>
+      <li><span>⚡</span><div>Quiz every <b>15 balls</b>, <b>10 seconds</b>, a ball every 2 seconds. Wrong: <b>−100</b> and you lose <b>two levels</b>.</div></li>
+      <li><span>🎲</span><div><b>Extra challenges:</b> questions about your board, recite the lecture, type the word, and minigames (Who's this?, Memory pairs, The exam starts NOW, Coffee break, Find the mistake).</div></li>
+      <li><span>💣</span><div><b>Bomb ball</b>, <b>midterm wall</b>, Eviatar drops for you if you wait 5 seconds, and a <b>final exam</b> every 100 balls.</div></li>
+      <li><span>✖️2</span><div>All points are <b>doubled</b>. Reach the end to get into <b>8200</b>.</div></li>
+    </ul>
+    <div class="actions"><span style="flex:1"></span><button id="rulesDone" type="button">Got it</button></div>
   </div>
 </div>
 
@@ -540,6 +582,7 @@
     <h3>Le Patate DDS</h3>
     <p style="font-size:17px;margin:10px 0 4px">Made by <b>Daniel Kozin</b></p>
     <p style="font-size:15px;margin:0 0 6px;color:#6a5fa0">Inspired by Guy Sokolik</p>
+    <p style="margin:12px 0 0"><button id="rulesBtn" class="add" type="button">📖 How to play: Normal, Hard, Eviatar</button></p>
     <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button> <button id="adminBtn" class="add" type="button">📊 Admin panel</button></p>
     <p id="testMinis" class="hidden" style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px"><b style="width:100%;font-size:14px">🧪 Try a minigame (Eviatar mode):</b><button class="add" type="button" data-mini="who">🧩 Who's this?</button><button class="add" type="button" data-mini="memory">🃏 Memory</button><button class="add" type="button" data-mini="react">⏱️ Exam starts NOW</button><button class="add" type="button" data-mini="coffee">☕ Coffee</button><button class="add" type="button" data-mini="mistake">🔍 Find the mistake</button><button class="add" type="button" data-mini="type">⌨️ Type the word</button></p>
     <div class="actions"><span style="flex:1"></span><button id="infoDone">Done</button><span style="flex:1"></span></div>
@@ -1371,7 +1414,7 @@ function gameOver(reason){
   document.getElementById('finalScore').textContent = score;
   overNameIn.value = username || '';
   document.getElementById('saveNote').textContent = '';
-  const sb = document.getElementById('saveBtn'); sb.disabled = false; sb.textContent = '💾 Save score';
+  const sb = document.getElementById('saveBtn'); sb.disabled = false; sb.textContent = '💾 SAVE MY SCORE';
   document.getElementById('over').classList.remove('hidden');
   updateHud();
   prepareShare();
@@ -2767,7 +2810,7 @@ async function saveFromGameOver(){
     saveNote.textContent = r.improved ? `🏆 New best: ${r.best}` : `Saved. Your best run is still ${r.best}`;
     renderLb();
   } else {
-    saveBtn.disabled = false; saveBtn.textContent = '💾 Save score';
+    saveBtn.disabled = false; saveBtn.textContent = '💾 SAVE MY SCORE';
     saveNote.textContent = "Couldn't save. Check your connection and try again.";
   }
 }
@@ -3036,8 +3079,10 @@ function startTestRun(mode){
   floatText(mode === 'eviatar' ? '🧪 EVIATAR TEST: 4 GILAS' : '🧪 TEST RUN: 4 GILAS', W/2, 200, '#ffd43b', 22);
 }
 const tutModal = document.getElementById('tutModal');
+const MODE_SUM = {normal: 'Merge lecturers, keep the pile below the dashed line.', hard: 'Plus pop quizzes every 25 balls, a turtle and random events.', eviatar: 'Everything in Hard, plus an exam clock, a shrinking board and minigames.'};
 function setPicked(m){
   pickedMode = m; store.set('lupatat-mode', m);
+  const ms = document.getElementById('modeSum'); if (ms) ms.textContent = MODE_SUM[m] || '';
   document.getElementById('modeN').classList.toggle('sel', m === 'normal');
   document.getElementById('modeH').classList.toggle('sel', m === 'hard');
   document.getElementById('modeE').classList.toggle('sel', m === 'eviatar');
@@ -3076,6 +3121,25 @@ document.getElementById('newsGo').onclick = () => { store.set('lupatat-news2', t
 document.getElementById('newsBack').onclick = () => { newsModal.classList.add('hidden'); nameModal.classList.remove('hidden'); };
 document.getElementById('tutBack').onclick = () => { tutModal.classList.add('hidden'); nameModal.classList.remove('hidden'); };
 document.getElementById('nameGo').onclick = startPlaying;
+// ---------- rules (for everyone) ----------
+const rulesModal = document.getElementById('rulesModal');
+let rulesFrom = null;
+function showRules(tab){
+  document.querySelectorAll('#rulesModal .rtabs button').forEach(b => b.classList.toggle('sel', b.dataset.r === tab));
+  document.querySelectorAll('#rulesModal .rpage').forEach(p => p.classList.toggle('hidden', p.dataset.r !== tab));
+}
+function openRules(from){
+  rulesFrom = from; if (from) from.classList.add('hidden');
+  paused = true; showRules(pickedMode || 'normal'); rulesModal.classList.remove('hidden');
+}
+document.querySelectorAll('#rulesModal .rtabs button').forEach(b => b.onclick = () => showRules(b.dataset.r));
+document.getElementById('rulesDone').onclick = () => {
+  rulesModal.classList.add('hidden');
+  if (rulesFrom) rulesFrom.classList.remove('hidden'); else paused = false;
+  rulesFrom = null;
+};
+document.getElementById('rulesLink').onclick = () => openRules(nameModal);
+document.getElementById('rulesBtn').onclick = () => { closeInfo(); openRules(null); };
 window.addEventListener('keydown', e => { if (e.key === 'Enter' && !nameModal.classList.contains('hidden')){ e.preventDefault(); startPlaying(); } });
 
 // shared storage is used only for the secret character the owner sets
