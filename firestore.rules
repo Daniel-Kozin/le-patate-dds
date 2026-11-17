@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // one document per player per mode: scores_normal / scores_hard / scores_eviatar
+    function isBoard(coll) {
+      return coll in ['scores_normal', 'scores_hard', 'scores_eviatar'];
+    }
+    function valid(d) {
+      return d.keys().hasOnly(['name', 'score', 'games', 'at'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 16
+        && d.score is int && d.score >= 0 && d.score <= 100000000
+        && d.games is int && d.games >= 0
+        && d.at is int;
+    }
+
+    match /{coll}/{player} {
+      allow read: if isBoard(coll);
+      allow create: if isBoard(coll) && valid(request.resource.data);
+      // a best score can only go up, and the name can't be changed
+      allow update: if isBoard(coll) && valid(request.resource.data)
+        && request.resource.data.score >= resource.data.score
+        && request.resource.data.name == resource.data.name;
+      allow delete: if false;
+    }
+  }
+}
