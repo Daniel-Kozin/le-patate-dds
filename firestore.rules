@@ -2,24 +2,32 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // one document per player per mode: scores_normal / scores_hard / scores_eviatar
+    // one document per player (name + machzor) per mode: scores_normal / scores_hard / scores_eviatar
     function isBoard(coll) {
       return coll in ['scores_normal', 'scores_hard', 'scores_eviatar'];
     }
     function valid(d) {
-      return d.keys().hasOnly(['name', 'score', 'games', 'at'])
+      return d.keys().hasOnly(['name', 'machzor', 'score', 'tier', 'navy', 'games', 'at'])
         && d.name is string && d.name.size() > 0 && d.name.size() <= 16
+        && d.machzor in ['ה', 'ו', 'ז', 'ח', 'ט', 'אחר']
         && d.score is int && d.score >= 0 && d.score <= 100000000
+        && d.tier is int && d.tier >= 0 && d.tier <= 40
+        && d.navy is bool
         && d.games is int && d.games >= 0
         && d.at is int;
+    }
+    // the kept run can only get better: drafted first, then biggest lecturer, then score
+    function notWorse(n, o) {
+      return (n.navy && !o.get('navy', false))
+        || (n.navy == o.get('navy', false) && n.tier > o.get('tier', -1))
+        || (n.navy == o.get('navy', false) && n.tier == o.get('tier', -1) && n.score >= o.score);
     }
 
     match /{coll}/{player} {
       allow read: if isBoard(coll);
       allow create: if isBoard(coll) && valid(request.resource.data);
-      // a best score can only go up, and the name can't be changed
       allow update: if isBoard(coll) && valid(request.resource.data)
-        && request.resource.data.score >= resource.data.score
+        && notWorse(request.resource.data, resource.data)
         && request.resource.data.name == resource.data.name;
       allow delete: if false;
     }
