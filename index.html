@@ -105,6 +105,9 @@
   .lb .nm{direction:ltr;text-align:left}
   .overlay .savebox{flex-wrap:wrap}
   .overlay .savebox button{flex:1 1 100%}
+  .idrow{display:flex;gap:8px;margin-top:6px}
+  .idrow input{flex:1;min-width:0;font-family:inherit;font-size:16px;font-weight:600;padding:8px 10px;border:2px solid #cfc5ff;border-radius:12px;background:#fff;color:#2b1d5c}
+  #overNameIn[readonly],#machIn:disabled{opacity:1;background:#f3f0ff;color:#2b1d5c;border-color:#e5dbff}
   .machIn{flex:none;font-family:inherit;font-size:16px;font-weight:600;padding:8px 6px;border:2px solid #cfc5ff;border-radius:12px;background:#fff;color:#2b1d5c;direction:rtl}
   .lb .gap{background:none;justify-content:center;padding:0;opacity:.5}
   #lbList{max-height:60vh;overflow:auto}
@@ -513,7 +516,9 @@
 <div id="fx"></div>
 <div id="nameModal" class="modal hidden">
   <div class="panel">
-    <h3>Pick a mode</h3>
+    <h3>Who are you?</h3>
+    <div class="idrow"><input id="idName" type="text" maxlength="16" placeholder="Your name" autocomplete="nickname" spellcheck="false"><select id="idMach" class="machIn" title="מחזור"><option value="">מחזור?</option><option value="ה">מחזור ה</option><option value="ו">מחזור ו</option><option value="ז">מחזור ז</option><option value="ח">מחזור ח</option><option value="ט">מחזור ט</option><option value="אחר">אחר</option></select></div>
+    <h3 style="margin-top:12px">Pick a mode</h3>
     <div class="modes"><button type="button" id="modeN">😊 Normal</button><button type="button" id="modeH" class="hard">🔥 Hard</button><button type="button" id="modeE" class="evi">💀 Eviatar</button></div>
     <div class="warn" id="nameWarn"></div>
     <div class="actions"><span style="flex:1"></span><button id="nameGo" class="add">Play!</button></div>
@@ -2729,7 +2734,23 @@ async function lbSave(name, mach, mode, run){
   }catch(e){ return {ok: false}; }
 }
 const machIn = document.getElementById('machIn');
+// ---------- who's playing: name + machzor are required before a game starts ----------
+const idName = document.getElementById('idName'), idMach = document.getElementById('idMach');
+idName.value = username || ''; idMach.value = MACH.includes(store.get('lupatat-machzor', '')) ? store.get('lupatat-machzor', '') : '';
+function identityOk(){
+  const warn = document.getElementById('nameWarn');
+  const name = cleanName(idName.value);
+  if (!name){ warn.textContent = 'Type your name first 👆'; idName.focus(); return false; }
+  if (!MACH.includes(idMach.value)){ warn.textContent = 'Pick your מחזור first 👆'; idMach.focus(); return false; }
+  warn.textContent = '';
+  username = name; idName.value = name; store.set('lupatat-username', name); store.set('lupatat-machzor', idMach.value);
+  overNameIn.value = name; machIn.value = idMach.value;
+  return true;
+}
+idName.addEventListener('input', () => { document.getElementById('nameWarn').textContent = ''; });
+idMach.addEventListener('change', () => { document.getElementById('nameWarn').textContent = ''; });
 machIn.value = MACH.includes(store.get('lupatat-machzor', '')) ? store.get('lupatat-machzor', '') : '';
+overNameIn.readOnly = true; machIn.disabled = true; overNameIn.title = machIn.title = 'Change your name on the start screen';
 const saveBtn = document.getElementById('saveBtn'), saveNote = document.getElementById('saveNote');
 async function saveFromGameOver(){
   if (saveBtn.disabled) return;
@@ -3027,6 +3048,7 @@ document.getElementById('modeH').onclick = () => setPicked('hard');
 document.getElementById('modeE').onclick = () => setPicked('eviatar');
 setPicked(pickedMode);
 function startPlaying(){
+  if (!identityOk()) return;
   // first time in hard mode: show what's new
   if (pickedMode === 'hard' && !store.get('lupatat-hard-tut4', false)){
     nameModal.classList.add('hidden'); tutModal.classList.remove('hidden'); return;
