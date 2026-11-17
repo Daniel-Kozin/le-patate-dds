@@ -1979,7 +1979,7 @@ function miniTick(){
     if (simTime - mini.lastAuto >= cfg().auto){ mini.lastAuto = simTime; drop(true); } // the balls keep coming
   }
   if (mini.tick) mini.tick();
-  if (!mini.done && left <= 0) miniEnd(false, mini.timeoutMsg || "⏰ TIME'S UP");
+  if (!mini.done && left <= 0){ if (mini.reveal) mini.reveal(); miniEnd(false, mini.timeoutMsg || "⏰ TIME'S UP"); }
 }
 function miniEnd(ok, msg){
   if (!mini){ mwrap.classList.add('hidden'); return; }
@@ -1998,7 +1998,7 @@ function miniEnd(ok, msg){
   }
   updateHud();
   const wasOverlay = mini.overlay;
-  setTimeout(() => { mini = null; if (wasOverlay){ mwrap.classList.add('hidden'); mBody.innerHTML = ''; } }, wasOverlay ? 1000 : 0);
+  setTimeout(() => { mini = null; if (wasOverlay){ mwrap.classList.add('hidden'); mBody.innerHTML = ''; } }, wasOverlay ? (ok ? 1000 : 1700) : 0);
 }
 const el = (tag, cls, txt) => { const d = document.createElement(tag); if (cls) d.className = cls; if (txt != null) d.textContent = txt; return d; };
 const MINI = {
@@ -2012,9 +2012,21 @@ const MINI = {
     const sx = 150 + Math.random()*120, sy = 140 + Math.random()*120;
     cv.getContext('2d').drawImage(off, sx, sy, 200, 200, 0, 0, 200, 200);
     const names = shuffled([t, ...shuffled(pool.filter(x => x !== t)).slice(0, 3)]);
-    const grid = el('div', 'qo');
-    names.forEach(n => { const b = el('button', null, P(n).name); b.type = 'button'; b.onclick = () => { if (mini && !mini.done){ b.classList.add(n === t ? 'ok' : 'bad'); miniEnd(n === t, n === t ? 'YOU KNOW YOUR LECTURERS!' : `IT WAS ${P(t).name.toUpperCase()}`); } }; grid.appendChild(b); });
-    mBody.append(cv, grid);
+    // same format as the quiz: tap to select, then Submit; the right answer is shown afterwards
+    const grid = el('div', 'qo'), btns = [], right = names.indexOf(t); let sel = -1;
+    const sub = el('button', 'qsub', 'Submit ✔'); sub.type = 'button'; sub.disabled = true;
+    names.forEach((n, k) => {
+      const b = el('button', null, P(n).name); b.type = 'button';
+      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sfx.squeak(); };
+      grid.appendChild(b); btns.push(b);
+    });
+    mini.reveal = () => { btns.forEach(x => x.classList.remove('sel')); btns[right].classList.add('ok'); if (sel >= 0 && sel !== right) btns[sel].classList.add('bad'); sub.disabled = true; };
+    sub.onclick = () => {
+      if (sel < 0 || !mini || mini.done) return;
+      const ok = sel === right; mini.reveal();
+      miniEnd(ok, ok ? 'YOU KNOW YOUR LECTURERS!' : `IT WAS ${P(t).name.toUpperCase()}`);
+    };
+    mBody.append(cv, grid, sub);
     mini.tick = () => { const f = Math.max(0, 2 - (simTime - mini.start)/3); cv.style.filter = `blur(${f}px)`; };
   },
   // 🃏 memory pairs
