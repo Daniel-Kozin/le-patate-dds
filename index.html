@@ -466,7 +466,7 @@
       <li><span>👀</span><div><b>Questions about your board:</b> "How many Omers are on the board?" You get 5 seconds.</div></li>
       <li><span>🧠</span><div><b>Recite the lecture:</b> 5 faces flash, then tap them in the same order in the strip under the board.</div></li>
       <li><span>⌨️</span><div><b>Type the word:</b> a nasty long word pops up. Type it exactly before the timer runs out (half a second per letter, plus 1.5 seconds). Wrong or too slow counts as a wrong answer.</div></li>
-      <li><span>🎲</span><div><b>Random minigames</b> (the game keeps running!): 🧩 Who's this?, 🃏 Memory pairs, ⏱️ The exam starts NOW (tap on green, not before), ☕ Coffee break (tap fast for turbo drops), 🔍 Find the mistake (tap the wrong line of a derivation) and 🎯 Precision drop.</div></li>
+      <li><span>🎲</span><div><b>Random minigames</b> (the game keeps running!): 🧩 Who's this?, 🃏 Memory pairs, ⏱️ The exam starts NOW (tap on green, not before), ☕ Coffee break (tap fast for turbo drops) and 🔍 Find the mistake (tap the wrong line of a derivation).</div></li>
       <li><span>💣</span><div><b>Bomb ball:</b> merge it within 15 seconds or it blows up everything it touches.</div></li>
       <li><span>🧱</span><div><b>Midterm wall:</b> every 20 balls, a bar blocks the middle of the board for the next 35 balls.</div></li>
       <li><span>🕶️</span><div><b>He's watching:</b> don't drop for 5 seconds and Eviatar drops one for you.</div></li>
@@ -1985,7 +1985,7 @@ let mini = null, miniNext = 0, boostUntil = 0, miniBag = [];
 const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return a; };
 function miniStart(){
   miniNext = simTime + 25 + Math.random()*20;
-  if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'precision', 'mistake']);
+  if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'mistake']); // precision drop is turned off
   for (let tries = 0; tries < 5; tries++){
     const type = miniBag.pop() || 'react';
     if (type === 'who' && seenTiers().length < 4) continue;
