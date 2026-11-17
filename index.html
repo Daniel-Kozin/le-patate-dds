@@ -183,6 +183,31 @@
   .ring{position:absolute;left:50%;top:45%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:8px solid var(--c,#ffd43b);animation:ring 1s ease-out forwards;z-index:7}
   @keyframes ring{from{transform:scale(.2);opacity:1}to{transform:scale(30);opacity:0}}
   /* hard mode */
+  .stamp{direction:ltr;unicode-bidi:isolate;position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);font-family:'Anton',Impact,sans-serif;font-size:min(17vw,110px);letter-spacing:2px;color:var(--c);
+    text-shadow:5px 5px 0 #000,0 0 40px var(--c);white-space:nowrap;animation:stampIn 1.1s cubic-bezier(.2,1.6,.4,1) forwards;z-index:6}
+  @keyframes stampIn{0%{opacity:0;transform:translate(-50%,-50%) scale(3) rotate(-12deg)}18%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}75%{opacity:1;transform:translate(-50%,-50%) scale(1.06) rotate(-6deg)}100%{opacity:0;transform:translate(-50%,-80%) scale(.9) rotate(-6deg)}}
+  .vig{position:fixed;inset:0;box-shadow:inset 0 0 140px 30px var(--c);animation:vigP .8s ease-out forwards;z-index:5}
+  @keyframes vigP{0%{opacity:1}100%{opacity:0}}
+  body.glitch #app{animation:glitch .45s steps(2) 1}
+  @keyframes glitch{0%{transform:translate(-8px,3px);filter:hue-rotate(90deg) saturate(3)}25%{transform:translate(7px,-4px)}50%{transform:translate(-5px,-2px);filter:invert(.15)}75%{transform:translate(6px,4px)}100%{transform:none;filter:none}}
+  .tfn{text-align:center;font-weight:800;color:#7950f2;font-size:14px}
+  .tfq{font-weight:700;font-size:16px;color:#2b1d5c;margin:6px 0;text-align:center}
+  .tfa{text-align:center;font-weight:800;font-size:18px;color:#1c7ed6;background:#e7f5ff;border-radius:10px;padding:6px;margin-bottom:8px}
+  .tfrow{display:flex;gap:8px}
+  .tfrow button{flex:1;font-family:inherit;font-weight:900;font-size:20px;padding:14px 6px;border-radius:14px;border:0;color:#fff}
+  .tfrow .t{background:#2f9e44;box-shadow:0 4px 0 #1e6e30}
+  .tfrow .f{background:#e03131;box-shadow:0 4px 0 #a51111}
+  .tfrow button.bad{outline:4px solid #000}
+  .mt{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .mt button{font-family:inherit;font-size:13px;font-weight:600;padding:7px 6px;border-radius:10px;border:2px solid #e5dbff;background:#f8f6ff;color:#2b1d5c;box-shadow:none;min-height:44px;line-height:1.25}
+  .mt button.sel{border-color:#7950f2;background:#e5dbff}
+  .mt button.ok{background:#8ce99a;border-color:#2f9e44}
+  .mt button.bad{background:#ffa8a8;border-color:#e03131}
+  .mt .mh{font-size:11px;font-weight:800;color:#7950f2;text-align:center;border:0;background:none}
+  #pbar{position:absolute;top:6px;right:6px;z-index:5;display:none;gap:6px}
+  body.arcade #pbar{display:flex}
+  #pbar button{font-family:inherit;font-size:13px;font-weight:800;padding:5px 9px;border-radius:12px;border:2px solid #2b1d5c;background:#fff3bf;color:#2b1d5c;box-shadow:0 3px 0 #2b1d5c}
+  #pbar button:disabled{opacity:.4;box-shadow:none}
   .modes{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
   .modes button.arc.sel{background:#e6fcf5;border-color:#12b886;color:#087f5b}
   body.arcade .balldrop{display:none}
@@ -454,6 +479,7 @@
   </div>
   <div id="stage">
     <canvas id="cv"></canvas>
+    <div id="pbar"><button type="button" id="pFifty" title="Remove 2 wrong answers">🎯 50/50 ×1</button><button type="button" id="pSkip" title="Skip this challenge">⏭️ Skip ×1</button></div>
     <div id="mwrap" class="qwrap hidden">
       <div class="qbox mbox">
         <div class="qh"><span id="mTitle"></span><b id="mTime"></b></div>
@@ -571,6 +597,8 @@
       <li><span>❤️</span><div>You have <b>3 lives</b>. A wrong answer or running out of time costs a life. Lose all 3 and it's over.</div></li>
       <li><span>⭐</span><div>Your score is <b>how many challenges you got right</b>. Streaks of 5 and 10 set off a party.</div></li>
       <li><span>⚡</span><div>Every 10 right answers is a new level, and the quiz timer gets shorter.</div></li>
+      <li><span>🎯</span><div><b>Power-ups:</b> 🎯 50/50 removes 2 wrong answers (you get one more every 15 wins), ⏭️ Skip once per game, and every 10 in a row gives <b>+1 ❤️</b> (up to 5).</div></li>
+      <li><span>👹</span><div><b>Boss every 20 challenges:</b> 3 hard questions in a row, 8 seconds each. Beat it for <b>+5 and +1 ❤️</b>, miss one and the boss takes a life.</div></li>
       <li><span>🏆</span><div>It has <b>its own leaderboard</b>.</div></li>
     </ul>
     <div class="actions"><span style="flex:1"></span><button id="rulesDone" type="button">Got it</button></div>
@@ -594,7 +622,7 @@
     <p style="font-size:15px;margin:0 0 6px;color:#6a5fa0">Inspired by Guy Sokolik</p>
     <p style="margin:12px 0 0"><button id="rulesBtn" class="add" type="button">📖 How to play: Normal, Hard, Eviatar</button></p>
     <p id="testWrap" class="hidden" style="margin:10px 0 0"><button id="testBtn" class="add" type="button">🧪 Test run: 4 Gilas</button> <button id="testBtnE" class="add" type="button">🧪 Eviatar test: 4 Gilas → 8200</button> <button id="adminBtn" class="add" type="button">📊 Admin panel</button></p>
-    <p id="testMinis" class="hidden" style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px"><b style="width:100%;font-size:14px">🧪 Try a minigame (Eviatar mode):</b><button class="add" type="button" data-mini="who">🧩 Who's this?</button><button class="add" type="button" data-mini="memory">🃏 Memory</button><button class="add" type="button" data-mini="react">⏱️ Exam starts NOW</button><button class="add" type="button" data-mini="coffee">☕ Coffee</button><button class="add" type="button" data-mini="mistake">🔍 Find the mistake</button><button class="add" type="button" data-mini="type">⌨️ Type the word</button></p>
+    <p id="testMinis" class="hidden" style="margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px"><b style="width:100%;font-size:14px">🧪 Try a minigame (Eviatar mode):</b><button class="add" type="button" data-mini="who">🧩 Who's this?</button><button class="add" type="button" data-mini="memory">🃏 Memory</button><button class="add" type="button" data-mini="react">⏱️ Exam starts NOW</button><button class="add" type="button" data-mini="coffee">☕ Coffee</button><button class="add" type="button" data-mini="mistake">🔍 Find the mistake</button><button class="add" type="button" data-mini="type">⌨️ Type the word</button><button class="add" type="button" data-mini="tf">✅❌ True/False</button><button class="add" type="button" data-mini="match">🔗 Match it</button></p>
     <div class="actions"><span style="flex:1"></span><button id="infoDone">Done</button><span style="flex:1"></span></div>
   </div>
 </div>
@@ -2085,7 +2113,7 @@ function reciteStart(){
   const pool = []; for (let t = 0; t < N; t++) if (isSeen(t)) pool.push(t);
   reciteNext = simTime + 40 + Math.random()*20;
   if (pool.length < 2) return;
-  const seq = Array.from({length: 5}, () => pick(pool));
+  const seq = Array.from({length: isArcade() ? 3 : 5}, () => pick(pool));
   recite = {seq, i: 0, phase: 'show', shownAt: simTime, step: -1, deadline: 0};
   rDots.innerHTML = ''; seq.forEach(() => rDots.appendChild(document.createElement('i')));
   rMsg.textContent = 'Remember the order…'; document.getElementById('rTime').textContent = '';
@@ -2322,6 +2350,55 @@ const MINI = {
     mBody.append(banner, el('div', 'psub', 'A student solved this question. One line of the solution is wrong. Tap it.'),
       el('div', 'plabel', 'QUESTION'), q, el('div', 'plabel', "STUDENT'S SOLUTION"), sol, sub, fix);
   },
+  // ✅❌ true or false: 3 quick statements in a row
+  tf(){
+    const items = Array.from({length: 3}, () => { const q = QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)], truth = Math.random() < 0.5;
+      return {q, truth, ans: truth ? q.o[0] : q.o[1 + Math.floor(Math.random()*3)]}; });
+    miniOpen('tf', '✅❌ TRUE OR FALSE ×3', 15);
+    mini.timeoutMsg = "⏰ TOO SLOW";
+    let i = 0;
+    const n = el('div', 'tfn'), q = el('div', 'tfq'), a = el('div', 'tfa'), row = el('div', 'tfrow');
+    const bT = el('button', 't', 'TRUE ✔'), bF = el('button', 'f', 'FALSE ✘'); bT.type = bF.type = 'button';
+    const show = () => { n.textContent = `${i + 1} / 3`; q.innerHTML = items[i].q.q; a.innerHTML = '→ ' + items[i].ans; }; // our own question file
+    const choose = v => {
+      if (!mini || mini.done) return;
+      if (v !== items[i].truth){ (v ? bT : bF).classList.add('bad'); a.innerHTML += items[i].truth ? ' ✔ was TRUE' : ' ✘ was FALSE'; miniEnd(false, '❌ WRONG'); return; }
+      blip({type: 'square', f0: 700 + i*200, dur: 0.08, vol: 0.08}); burst(W/2, 300, '#69db7c', 10);
+      i++; if (i === 3) miniEnd(true, '✅ 3 FOR 3!'); else show();
+    };
+    bT.onclick = () => choose(true); bF.onclick = () => choose(false);
+    row.append(bT, bF); mBody.append(n, q, a, row); show();
+  },
+  // 🔗 match it: 4 short questions, tap a question and then its answer
+  match(){
+    const plain = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent; };
+    const pool = shuffled(QUESTIONS.map((_, i) => i)), picked = [], seenA = new Set();
+    for (const k of pool){
+      const q = QUESTIONS[k], at = plain(q.o[0]).trim();
+      if (plain(q.q).length > 110 || plain(q.o[0]).length > 45 || seenA.has(at)) continue;
+      seenA.add(at); picked.push(q); if (picked.length === 4) break;
+    }
+    miniOpen('match', '🔗 MATCH IT', 26);
+    mBody.appendChild(el('div', 'hint2', 'Tap a question, then its answer'));
+    const grid = el('div', 'mt'), order = shuffled([0, 1, 2, 3]), L = [], Rb = [];
+    let sel = -1, done = 0;
+    grid.append(el('div', 'mh', 'QUESTION'), el('div', 'mh', 'ANSWER'));
+    for (let r = 0; r < 4; r++){
+      const lb = el('button'); lb.type = 'button'; lb.innerHTML = picked[r].q; L.push(lb);
+      const rb = el('button'); rb.type = 'button'; rb.innerHTML = picked[order[r]].o[0]; rb.dataset.k = order[r]; Rb.push(rb);
+      lb.onclick = () => { if (!mini || mini.done || lb.disabled) return; sel = r; L.forEach((x, j) => x.classList.toggle('sel', j === r)); sfx.squeak(); };
+      rb.onclick = () => {
+        if (!mini || mini.done || rb.disabled || sel < 0) return;
+        if (+rb.dataset.k === sel){
+          L[sel].classList.remove('sel'); L[sel].classList.add('ok'); rb.classList.add('ok'); L[sel].disabled = rb.disabled = true; sel = -1;
+          blip({type: 'square', f0: 700 + done*180, dur: 0.08, vol: 0.08}); done++;
+          if (done === 4) miniEnd(true, '🔗 ALL MATCHED!');
+        } else { rb.classList.add('bad'); L[sel].classList.add('bad'); miniEnd(false, '❌ WRONG MATCH'); }
+      };
+      grid.append(lb, rb);
+    }
+    mBody.appendChild(grid);
+  },
   // 🃏 memory pairs
   memory(){
     const pool = shuffled(seenTiers()).slice(0, 4), deck = shuffled([...pool, ...pool]);
@@ -2518,8 +2595,8 @@ function setModeTag(){
   tag.textContent = `${isEvi() ? '💀 EVIATAR' : '🔥 HARD'} · quiz in ${Math.max(0, cfg().qEvery - qDrops)}`;
 }
 // ---------- 🎮 Minigames mode: endless challenges, no balls, 3 lives ----------
-let arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: []};
-const ARC_POOL = ['quiz', 'quiz', 'quiz', 'quiz', 'mistake', 'who', 'memory', 'react', 'coffee', 'type', 'recite'];
+let arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: [], fifty: 1, skips: 1, boss: null, bossNo: 0, nextBoss: 20};
+const ARC_POOL = ['quiz', 'quiz', 'quiz', 'quiz', 'tf', 'tf', 'match', 'mistake', 'who', 'memory', 'react', 'coffee', 'type', 'recite'];
 const ARC_CHEER = ['Le patate!', 'Très bien!', 'Magnifique!', 'Incroyable!', 'Bravo!', 'Oui oui oui!', 'C\'est parfait!'];
 const ARC_SAD = ['Oh non!', 'Mon dieu!', 'Catastrophe!', 'Aïe aïe aïe!'];
 // a lecturer's face pops up at the side and cheers (or boos)
@@ -2536,14 +2613,39 @@ function faceCheer(happy){
   el.style.top = (55 + Math.random()*25) + '%';
   fxEl.appendChild(el); setTimeout(() => el.remove(), 2700);
 }
+const stamp = (text, color) => { fxEl.querySelectorAll('.stamp').forEach(e => e.remove()); fxAdd('stamp', {'--c': color}, 1150, text); };
+const vignette = color => fxAdd('vig', {'--c': color}, 850);
+function glitch(){ document.body.classList.remove('glitch'); void document.body.offsetWidth; document.body.classList.add('glitch'); setTimeout(() => document.body.classList.remove('glitch'), 500); }
+function hype(ok){
+  if (ok){
+    const s = arc.streak;
+    stamp(pick(['CORRECT!', 'YES!', 'BOOM!', 'NAILED IT', 'GENIUS', 'EZ', 'LE PATATE!', 'BIG BRAIN']), s >= 10 ? '#ffd43b' : s >= 5 ? '#ff922b' : '#69db7c');
+    vignette(s >= 5 ? 'rgba(255,146,43,.55)' : 'rgba(105,219,124,.5)');
+    emojiRain(s >= 5 ? ['🔥', '💯', '⭐', '🎉', '⚡', '🧠'] : ['✅', '⭐', '🎉', '💯'], 10 + Math.min(30, s*3));
+    for (let k = 0; k < 4; k++) burst(W*(0.2 + 0.2*k), 120 + Math.random()*300, pick(['#69db7c', '#ffd43b', '#74c0fc', '#f783ac']), 14);
+    ringFx(s >= 5 ? '#ff922b' : '#69db7c'); shake = 7;
+    meme(pick(['big', 'combo2', 'combo3']), {side: 'l', force: true});
+    if (s >= 3) meme(null, {custom: ['⚡', `x${s} COMBO`, 'pulse'], side: 'r', force: true});
+    else meme(pick(['big', 'combo2']), {side: 'r', force: true});
+    [0, 1, 2].forEach(k => blip({type: 'square', f0: 520*Math.pow(1.26, k + Math.min(8, s)/2), dur: 0.09, vol: 0.07, delay: k*0.07}));
+  } else {
+    stamp(pick(['WRONG!', 'NOPE', 'FAIL', 'MOED BET', 'BRUH', 'OUCH']), '#ff4d4d');
+    vignette('rgba(255,40,40,.7)'); glitch(); shake = 24; flashFx('rgba(255,60,60,.55)');
+    emojiRain(['💀', '📉', '😭', '🪦', '💔'], 26);
+    meme('danger', {side: 'l', force: true}); meme(null, {custom: pick([['😵', 'EMOTIONAL DAMAGE', 'shake'], ['🤡', 'CLOWN MOVE', 'spin'], ['📉', 'GPA DOWN', 'shake']]), side: 'r', force: true});
+    noise(0.35, 0.3); blip({type: 'sawtooth', f0: 220, f1: 50, dur: 0.8, vol: 0.2});
+  }
+}
 function arcadeResult(ok){
   arc.n++;
+  hype(ok);
+  if (ok && arc.streak + 1 >= 10 && (arc.streak + 1) % 10 === 0 && arc.lives < 5){ arc.lives++; setTimeout(() => { floatText('+1 ❤️ BONUS LIFE', W/2, 260, '#ff8787', 26); stamp('+1 ❤️', '#ff8787'); }, 700); }
+  if (ok && ((arc.wins || 0) + 1) % 15 === 0){ arc.fifty++; setTimeout(() => floatText('+1 🎯 50/50', W/2, 290, '#ffd43b', 22), 900); }
   if (ok){
     arc.streak++; arc.wins = (arc.wins || 0) + 1;
     score += 1; // one point per challenge you get right
     floatText(`✔ ${score}`, W/2, 170, '#69db7c', 30);
-    sfx.fanfare(); burst(W/2, 170, '#69db7c', 22);
-    if (Math.random() < 0.55) meme(pick(['big', 'combo2', 'combo3']));
+    sfx.fanfare();
     if (Math.random() < 0.35) faceCheer(true);
     if (Math.random() < 0.4) say('arc', pick(ARC_CHEER), 20);
     if (arc.wins % 3 === 0) profPopup(true);
@@ -2558,18 +2660,72 @@ function arcadeResult(ok){
   } else {
     arc.streak = 0; arc.lives--;
     floatText(arc.lives > 0 ? `💔 ${arc.lives} ${arc.lives === 1 ? 'LIFE' : 'LIVES'} LEFT` : '💔 OUT OF LIVES', W/2, 170, '#ff6b6b', 26);
-    shake = 14; flashFx('#ff6b6b'); blip({type: 'sawtooth', f0: 160, f1: 60, dur: 0.6, vol: 0.18}); angryProf(false);
-    emojiRain(['💀', '📉', '😭'], 10);
-    meme('danger', {force: true});
+    angryProf(false);
     if (Math.random() < 0.5) faceCheer(false);
     say('arc', pick(ARC_SAD), 30);
     if (arc.lives === 1) setTimeout(() => meme(null, {custom: ['🚨', 'LAST LIFE', 'pulse'], side: 'r', force: true, big: true, top: 40}), 900);
     if (arc.lives <= 0) arc.dead = true;
   }
-  setModeTag(); updateHud();
+  setModeTag(); updateHud(); powerBar();
+}
+// ---------- power-ups ----------
+const pFifty = document.getElementById('pFifty'), pSkip = document.getElementById('pSkip');
+function powerBar(){
+  pFifty.textContent = `🎯 50/50 ×${arc.fifty}`; pSkip.textContent = `⏭️ Skip ×${arc.skips}`;
+  pFifty.disabled = !(arc.fifty > 0 && qActive && !qActive.done && !qActive.fiftyUsed && !qActive.boss);
+  pSkip.disabled = !(arc.skips > 0 && !arc.boss && ((qActive && !qActive.done) || (mini && !mini.done) || (typing && !typing.done) || recite));
+}
+pFifty.onclick = () => {
+  if (pFifty.disabled) return;
+  qActive.fiftyUsed = true; arc.fifty--;
+  shuffled(qActive.btns.map((_, i) => i).filter(i => i !== qActive.correct)).slice(0, 2).forEach(i => { const b = qActive.btns[i]; b.style.visibility = 'hidden'; b.disabled = true; });
+  stamp('50/50', '#ffd43b'); blip({type: 'triangle', f0: 600, f1: 1200, dur: 0.25, vol: 0.1}); powerBar();
+};
+pSkip.onclick = () => {
+  if (pSkip.disabled) return;
+  arc.skips--;
+  if (qActive){ qActive.done = true; closeQuestion(); }
+  if (mini) miniEnd(null);
+  if (typing) typeEnd(null);
+  if (recite) reciteEnd(null);
+  stamp('SKIP ⏭️', '#74c0fc'); blip({type: 'sawtooth', f0: 300, f1: 1400, dur: 0.3, vol: 0.06}); powerBar();
+};
+// ---------- 👹 bosses: every 20 challenges, 3 hard questions in a row ----------
+const BOSSES = [4, 6, 7, 8]; // Yuval Emek, Eviatar, Gila, Kurland
+function startBoss(){
+  const t = BOSSES[Math.min(BOSSES.length - 1, arc.bossNo)] ?? N - 1; arc.bossNo++;
+  arc.boss = {i: 0, t, nextAt: simTime + 2.2};
+  stamp('👹 BOSS FIGHT', '#e03131'); glitch(); shake = 26; flashFx('rgba(224,49,49,.6)'); airhorn(); noise(0.5, 0.35);
+  emojiRain(['👹', '⚔️', '🔥', '💀', '😈'], 40);
+  meme(null, {custom: ['👹', P(t).name.toUpperCase(), 'shake'], side: 'l', force: true, big: true, top: 30});
+  meme(null, {custom: ['⚔️', '3 QUESTIONS · 8 SEC', 'pulse'], side: 'r', force: true, big: true, top: 30});
+  say('boss', `Le patate ${P(t).name}! Boss!`, 80);
+}
+function bossQuestion(){
+  openQuestion(); qActive.time = 8; qActive.boss = true;
+  document.getElementById('qSubj').textContent = `👹 BOSS: ${P(arc.boss.t).name} · ${arc.boss.i + 1}/3`;
+}
+function bossAnswer(ok){
+  if (!ok){
+    arc.boss = null; stamp('BOSS WINS 👹', '#ff4d4d');
+    arcadeResult(false); return;
+  }
+  arc.boss.i++;
+  burst(W/2, 200, '#ffd43b', 30); shake = 12; ringFx('#ffd43b'); blip({type: 'square', f0: 500 + arc.boss.i*250, dur: 0.15, vol: 0.12});
+  floatText(`HIT ${arc.boss.i}/3 ⚔️`, W/2, 200, '#ffd43b', 30);
+  if (arc.boss.i < 3){ arc.boss.nextAt = simTime + 1.1; return; }
+  arc.boss = null; arc.n++;
+  score += 5; arc.lives = Math.min(5, arc.lives + 1); arc.streak++; arc.wins = (arc.wins || 0) + 1;
+  stamp('BOSS DEFEATED!', '#ffd43b'); flashFx('#ffd43b'); airhorn(); sfx.fanfare(); setTimeout(sfx.fanfare, 400);
+  emojiRain(['👑', '🏆', '🔥', '💯', '🎉', '⚔️'], 60);
+  meme(null, {custom: ['🏆', '+5 POINTS', 'bounce'], side: 'l', force: true, big: true, top: 30});
+  meme(null, {custom: ['❤️', '+1 LIFE', 'pulse'], side: 'r', force: true, big: true, top: 30});
+  say('boss', 'Victoire! Le patate!', 80);
+  setModeTag(); updateHud(); powerBar();
 }
 // side stuff between challenges, so the screen never feels empty
 function arcadeSideTick(){
+  if (arc.lives === 1 && !arc.dead && simTime >= (arc.beat || 0)){ arc.beat = simTime + 0.85; blip({type: 'sine', f0: 70, f1: 40, dur: 0.12, vol: 0.35}); blip({type: 'sine', f0: 65, f1: 38, dur: 0.12, vol: 0.28, delay: 0.18}); vignette('rgba(255,0,0,.25)'); }
   if (simTime >= zhNext){ zhNext = simTime + ZH_EVERY; sayChinese(); }
   if (simTime >= (arc.sideNext || 8)){
     arc.sideNext = simTime + 9 + Math.random()*8;
@@ -2588,6 +2744,7 @@ function arcadeStartNext(){
     if (type === 'type'){ typeStart(); return; }
     if (type === 'recite'){ reciteStart(); if (recite) return; continue; }
     if (type === 'mistake' && !MISTAKES.length) continue;
+    if ((type === 'tf' || type === 'match') && !QUESTIONS) continue;
     MINI[type](); return;
   }
   if (QUESTIONS) openQuestion();
@@ -2602,12 +2759,16 @@ function arcadeTick(){
   if (typing) typeTick();
   if (recite) reciteTick();
   arcadeSideTick();
+  if (qActive && !qActive.done){ const left = Math.ceil(qActive.time - (simTime - qStart)); if (left <= 3 && left !== arc.tick){ arc.tick = left; blip({type: 'square', f0: 900 + (3 - left)*200, dur: 0.06, vol: 0.09}); } }
+  if (simTime >= (arc.pbAt || 0)){ arc.pbAt = simTime + 0.25; powerBar(); }
+  if (arc.boss){ arc.idle = -1; if (!qActive && simTime >= arc.boss.nextAt) bossQuestion(); return; }
   const busy = qActive || mini || typing || recite || !rwrap.classList.contains('hidden');
   if (busy){ arc.idle = -1; return; }
   if (arc.idle < 0){ arc.idle = simTime; return; }
   if (simTime - arc.idle < 0.9) return;
   arc.idle = -1;
   if (arc.dead){ gameOver('lives'); return; }
+  if (arc.n >= arc.nextBoss && QUESTIONS){ arc.nextBoss += 20; startBoss(); return; }
   arcadeStartNext();
 }
 function drawArcade(){
@@ -2622,7 +2783,7 @@ function drawArcade(){
   ctx.restore();
 }
 function hardReset(){
-  arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: []};
+  arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: [], fifty: 1, skips: 1, boss: null, bossNo: 0, nextBoss: 20};
   document.body.classList.toggle('arcade', isArcade());
   eventsReset(); eviReset();
   closeQuestion(); tbRemove();
@@ -2703,7 +2864,7 @@ function answer(k){
   qTotal++; if (ok) qRight++;
   qActive.btns[qActive.correct].classList.add('ok');
   if (!ok && k >= 0) qActive.btns[k].classList.add('bad');
-  if (isArcade()){ arcadeResult(ok); setTimeout(() => { closeQuestion(); setModeTag(); }, ok ? 800 : 1600); return; }
+  if (isArcade()){ if (qActive.boss) bossAnswer(ok); else arcadeResult(ok); setTimeout(() => { closeQuestion(); setModeTag(); powerBar(); }, ok ? 800 : 1600); return; }
   if (qActive.exam){ examAnswer(ok, qActive.exam); return; }
   if (ok && isEvi()){ addTime(qActive.board ? TIME_BOARD_Q : TIME_QUIZ); pushWalls(); }
   if (ok){
