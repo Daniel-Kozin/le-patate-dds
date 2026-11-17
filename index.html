@@ -45,6 +45,7 @@
   .order span{font-weight:700;font-size:14px;line-height:20px;color:#2b1d5c}
   .row canvas{width:48px;height:48px;flex:none}
   .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+  .mid .pname{font-size:16px;font-weight:700;color:#2b1d5c;padding:4px 2px}
   .mid input[type=text]{width:100%;min-width:120px;font-family:inherit;font-size:16px;font-weight:600;padding:6px 8px;border:2px solid #cfc5ff;border-radius:10px;background:#ffffff;color:#2b1d5c;-webkit-text-fill-color:#2b1d5c;user-select:text;-webkit-user-select:text;opacity:1}
   .tools{display:flex;gap:4px;flex-wrap:wrap}
   .tools label,.tools button{font-size:12px;font-weight:600;padding:4px 8px;border-radius:8px;cursor:pointer;box-shadow:none;line-height:1.3}
@@ -164,26 +165,25 @@
   .qo button.ok{background:#8ce99a;box-shadow:0 3px 0 #2f9e44}
   .qo button.bad{background:#ffa8a8;box-shadow:0 3px 0 #e03131}
   .qo.lines{grid-template-columns:1fr}
-  .mbox.chalk{background:#24402f;color:#f1f3f5;border:7px solid #8a5a2b;box-shadow:0 8px 0 rgba(0,0,0,.3),inset 0 0 30px rgba(0,0,0,.35)}
-  .mbox.chalk .qh{color:#ffd43b}
-  .mbox.chalk .qdrop{color:#ffc9c9}
-  .mbox.chalk .qbar{background:#1a2e22}
-  #mwrap.chalkwrap{padding-top:2%}
-  .mbox.chalk{max-height:calc(100% - 10px);overflow-y:auto}
-  .mlabel{font-size:12px;font-weight:800;letter-spacing:1.5px;color:#ffd43b;margin:6px 0 3px;text-align:left}
-  .mbox.chalk .qo.lines{gap:5px}
-  .mbox.chalk .qo.lines button{display:flex;align-items:center;gap:9px;min-height:36px;padding:5px 9px}
-  .stepn{flex:none;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
-  .mbox.chalk .qo.lines button.sel .stepn{background:#ffd43b;color:#24402f}
-  .mbox.chalk .qo.lines button.bad .stepn{background:#ff6b6b}
-  .mbox.chalk .qo.lines button.bad::after{content:'✗ mistake';margin-left:auto;font-size:12px;font-weight:800;color:#ffc9c9}
-  .mbig{font-family:'Anton',Impact,sans-serif;font-size:min(8vw,32px);letter-spacing:1.5px;text-align:center;color:#ffd43b;text-shadow:2px 2px 0 #000;line-height:1.05;margin:0 0 2px}
-  .msub{text-align:center;font-size:13px;color:#d3f9d8;margin-bottom:8px}
-  .mbox.chalk .mhead{color:#fff;text-align:left;background:rgba(0,0,0,.22);border-radius:10px;padding:7px 10px;margin:0}
-  .mbox.chalk .qo.lines button{background:transparent;color:#f8f9fa;box-shadow:none;border:2px dashed rgba(255,255,255,.4);font-family:inherit}
-  .mbox.chalk .qo.lines button.sel{background:rgba(255,212,59,.22);border:2px solid #ffd43b}
-  .mbox.chalk .qo.lines button.bad{background:rgba(250,82,82,.35);border:2px solid #ff6b6b}
-  .mbox.chalk .mwhy{color:#ffd8a8}
+  #mwrap.paperwrap{padding-top:2%}
+  .mbox.paper{max-height:calc(100% - 10px);overflow-y:auto;padding:10px 12px}
+  .mbox.paper .qh{display:none}
+  .pbanner{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#e03131;color:#fff;border-radius:12px;padding:6px 12px;box-shadow:0 3px 0 #a51111}
+  .pbanner b{font-family:'Anton',Impact,sans-serif;font-size:min(5.6vw,24px);letter-spacing:1px;font-weight:400;white-space:nowrap}
+  .pbanner i{font-style:normal;font-weight:800;font-size:20px;background:#fff;color:#e03131;border-radius:10px;padding:0 8px;min-width:34px;text-align:center}
+  .psub{text-align:center;font-size:13px;color:#6a5fa0;margin:6px 0 8px}
+  .pq{background:#f1ecff;border-left:5px solid #7950f2;border-radius:8px;padding:8px 10px;font-weight:700;font-size:15px;color:#2b1d5c;line-height:1.35}
+  .pq math{font-size:1.1em}
+  .plabel{font-size:12px;font-weight:800;letter-spacing:1px;color:#7950f2;margin:10px 0 2px}
+  .psol{background:#fffef6;border:2px solid #e9e4d0;border-left:4px solid #ff8787;border-radius:8px;padding:2px 0}
+  .psol button{display:block;width:100%;text-align:left;background:transparent;box-shadow:none;border:0;border-radius:6px;color:#1c1a3a;font-size:16px;font-weight:600;min-height:39px;padding:6px 12px;line-height:1.3;border-bottom:1px solid #d0e4ff}
+  .psol button:last-child{border-bottom:0}
+  .psol button math{font-size:1.1em}
+  .psol button.sel{background:rgba(255,212,59,.6)}
+  .psol button.ok{background:#8ce99a}
+  .psol button.bad{background:#ffa8a8}
+  .pfix{font-size:14px;color:#2b8a3e;font-weight:700;margin-top:6px}
+  .pfix math{font-size:1.05em}
   .qo.lines button{text-align:left;padding:7px 10px;min-height:40px}
   .mhead{font-weight:700;font-size:16px;margin:2px 0 8px;color:#2b1d5c}
   .mhead math,.mwhy math{font-size:1.1em}
@@ -470,14 +470,14 @@
 <div id="facesModal" class="modal hidden">
   <div class="panel">
     <h3>Lecturers</h3>
-    <p class="hint">Top = smallest, bottom = biggest. Use ▲▼ to change the order, drag a photo onto a row to set it.</p>
+    <p class="hint">Top = smallest, bottom = biggest. You can change anyone's photo (or drag a photo onto a row). The names and the order stay fixed.</p>
     <div id="rows"></div>
     <div id="secretBox" class="secret"></div>
     <div class="warn" id="warn"></div>
     <div class="actions">
-      <button id="addPerson" class="add">＋ Add person</button>
+      <button id="addPerson" class="add hidden">＋ Add person</button>
       <span style="flex:1"></span>
-      <button id="resetFaces" class="ghost">Reset to default</button>
+      <button id="resetFaces" class="ghost">Reset photos</button>
       <button id="closeFaces">Done</button>
     </div>
   </div>
@@ -609,6 +609,13 @@ if (!Array.isArray(people) || people.length < 2){
     : defaultPeople();
 }
 people.forEach(p => { if (p && norm(p.name) === 'evitar prucatica') p.name = 'Eviatar Procaccia'; });
+// the lecturers and their order are fixed for everyone; only the photos can be changed
+{
+  const saved = Array.isArray(people) ? people.filter(p => p && typeof p.name === 'string') : [];
+  const alias = {'gila molkov': 'gila molko', 'omer bp': 'omer ben porat'};
+  const photoOf = n => { const p = saved.find(x => (alias[norm(x.name)] || norm(x.name)) === norm(n)); return p && typeof p.photo === 'string' ? p.photo : null; };
+  people = DEFAULT_NAMES.map(n => ({name: n, photo: photoOf(n)}));
+}
 function defaultPeople(){ return DEFAULT_NAMES.map(n => ({name: n, photo: null})); }
 // built-in photo for a known name (used whenever a person has no photo of their own)
 const BAKED = {};
@@ -1643,22 +1650,18 @@ function buildRows(){
   people.forEach((p, i) => {
     const row = document.createElement('div'); row.className = 'row';
     const order = document.createElement('div'); order.className = 'order';
-    const up = btn('▲', '', () => move(i, -1)); up.disabled = i === 0; up.title = 'Move up (smaller)';
-    const dn = btn('▼', '', () => move(i, 1)); dn.disabled = i === people.length - 1; dn.title = 'Move down (bigger)';
     const num = document.createElement('span'); num.textContent = i + 1;
-    order.append(up, num, dn);
+    order.append(num);
     const c = document.createElement('canvas'); c.width = 96; c.height = 96; c.dataset.t = i; rowCanvases.push(c);
     const mid = document.createElement('div'); mid.className = 'mid';
-    const inp = document.createElement('input'); inp.type = 'text'; inp.value = p.name; inp.placeholder = 'Name'; inp.spellcheck = false;
-    inp.oninput = () => { p.name = inp.value; savePeople(); if (!p.photo) loadImg(p); refreshMinis(); };
-    inp.onblur = () => { if (!p.name.trim()){ p.name = `Person ${i + 1}`; inp.value = p.name; savePeople(); refreshMinis(); } };
+    const inp = document.createElement('div'); inp.className = 'pname'; inp.textContent = p.name; // names are fixed
     const tools = document.createElement('div'); tools.className = 'tools';
-    const lab = document.createElement('label'); lab.textContent = p.photo ? 'Change photo' : 'Add photo';
+    const lab = document.createElement('label'); lab.textContent = 'Change photo';
     const f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*';
     f.onchange = () => { savePhoto(i, f.files[0]); lab.textContent = 'Change photo'; };
     lab.appendChild(f); tools.appendChild(lab);
-    if (p.photo) tools.appendChild(btn('Remove photo', '', () => { p.photo = null; loadImg(p); savePeople(); buildRows(); }));
-    if (people.length > 2){
+    if (p.photo) tools.appendChild(btn('Back to original', '', () => { p.photo = null; loadImg(p); savePeople(); buildRows(); }));
+    if (false){ // deleting lecturers is turned off
       const del = btn('Delete', 'danger', () => {
         if (del.dataset.armed){ people.splice(i, 1); structureChanged = true; savePeople(); rebuildTiers(); buildRows(); }
         else { del.dataset.armed = '1'; del.textContent = 'Sure? click again'; setTimeout(() => { if (del.isConnected){ delete del.dataset.armed; del.textContent = 'Delete'; } }, 2500); }
@@ -1686,7 +1689,7 @@ document.getElementById('facesBtn').onclick = openPanel;
 document.getElementById('closeFaces').onclick = closePanel;
 modal.addEventListener('click', e => { if (e.target === modal) closePanel(); });
 document.getElementById('addPerson').onclick = () => {
-  if (people.length >= MAX_PEOPLE) return;
+  return; // adding lecturers is turned off
   people.push({name: `Person ${people.length + 1}`, photo: null});
   structureChanged = true; savePeople(); rebuildTiers(); buildRows();
   const inputs = rowsEl.querySelectorAll('input[type=text]');
@@ -1696,13 +1699,13 @@ document.getElementById('addPerson').onclick = () => {
 const resetBtn = document.getElementById('resetFaces');
 resetBtn.onclick = () => {
   if (!resetBtn.dataset.armed){
-    resetBtn.dataset.armed = '1'; resetBtn.textContent = 'Removes all photos. Sure?';
-    setTimeout(() => { delete resetBtn.dataset.armed; resetBtn.textContent = 'Reset to default'; }, 3000);
+    resetBtn.dataset.armed = '1'; resetBtn.textContent = 'Back to the original photos?';
+    setTimeout(() => { delete resetBtn.dataset.armed; resetBtn.textContent = 'Reset photos'; }, 3000);
     return;
   }
-  people = defaultPeople(); people.forEach(loadImg);
-  structureChanged = true; savePeople(); rebuildTiers(); buildRows();
-  delete resetBtn.dataset.armed; resetBtn.textContent = 'Reset to default';
+  people.forEach(p => { p.photo = null; loadImg(p); });
+  savePeople(); buildRows();
+  delete resetBtn.dataset.armed; resetBtn.textContent = 'Reset photos';
 };
 
 // ---------- world events: sanctions, the Mossad, the UN, ceasefire ----------
@@ -2122,7 +2125,7 @@ function miniStart(){
 }
 function miniOpen(type, title, time){
   mini = {type, time, start: simTime, lastAuto: simTime, done: false, overlay: type !== 'precision'};
-  document.querySelector('#mwrap .mbox').classList.remove('chalk'); mwrap.classList.remove('chalkwrap');
+  document.querySelector('#mwrap .mbox').classList.remove('paper'); mwrap.classList.remove('paperwrap');
   if (mini.overlay){
     document.getElementById('mTitle').textContent = title;
     document.getElementById('mTime').textContent = Math.ceil(time); mBar.style.width = '100%';
@@ -2189,31 +2192,33 @@ const MINI = {
     mBody.append(cv, grid, sub);
     mini.tick = () => { const f = Math.max(0, 2 - (simTime - mini.start)/3); cv.style.filter = `blur(${f}px)`; };
   },
-  // 🔍 find the mistake: tap the wrong line of a derivation, then Submit
+  // 🔍 find the mistake: a question and a student's worked solution, tap the wrong step, then Submit
   mistake(){
     if (!mistakeBag.length) mistakeBag = shuffled(MISTAKES.map((_, i) => i));
     const m = MISTAKES[mistakeBag.pop()];
-    miniOpen('mistake', '🧑‍🏫 TA CHECK', 18 + m.s.length);
-    document.querySelector('#mwrap .mbox').classList.add('chalk'); mwrap.classList.add('chalkwrap');
-    const big = el('div', 'mbig', '🔍 FIND THE MISTAKE'), subt = el('div', 'msub', 'A student solved this. ONE step is wrong. Tap it, then Submit.');
-    const head = el('div', 'mhead'); head.innerHTML = m.h; // our own file, rendered at build time
-    const list = el('div', 'qo lines'), btns = []; let sel = -1;
-    const sub = el('button', 'qsub', 'Tap the wrong step first'); sub.type = 'button'; sub.disabled = true;
-    const why = el('div', 'mwhy');
+    miniOpen('mistake', '', 18 + m.s.length);
+    document.querySelector('#mwrap .mbox').classList.add('paper'); mwrap.classList.add('paperwrap');
+    const banner = el('div', 'pbanner'), clock = el('i', null, String(Math.ceil(mini.time)));
+    banner.append(el('b', null, '🔍 FIND THE MISTAKE'), clock);
+    const q = el('div', 'pq'); q.innerHTML = m.h; // our own file, rendered at build time
+    const sol = el('div', 'psol'), btns = []; let sel = -1;
+    const sub = el('button', 'qsub', 'Submit ✔'); sub.type = 'button'; sub.disabled = true;
+    const fix = el('div', 'pfix');
     m.s.forEach((line, k) => {
-      const b = el('button'); b.type = 'button';
-      const txt = el('span'); txt.innerHTML = line; b.append(el('span', 'stepn', String(k + 1)), txt);
-      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sub.textContent = `Step ${k + 1} is wrong ✔`; sfx.squeak(); };
-      list.appendChild(b); btns.push(b);
+      const b = el('button'); b.type = 'button'; b.innerHTML = line;
+      b.onclick = () => { if (!mini || mini.done) return; sel = k; btns.forEach((x, j) => x.classList.toggle('sel', j === k)); sub.disabled = false; sfx.squeak(); };
+      sol.appendChild(b); btns.push(b);
     });
-    mini.reveal = () => { btns.forEach(x => x.classList.remove('sel')); btns[m.b].classList.add('bad'); if (sel >= 0 && sel !== m.b) btns[sel].classList.add('sel'); sub.disabled = true; why.innerHTML = '💡 ' + m.w; };
+    // same as the quiz: the right answer turns green, a wrong pick turns red
+    mini.reveal = () => { btns.forEach(x => x.classList.remove('sel')); btns[m.b].classList.add('ok'); if (sel >= 0 && sel !== m.b) btns[sel].classList.add('bad'); sub.disabled = true; fix.innerHTML = '✔ ' + m.w; };
+    mini.tick = () => { clock.textContent = Math.max(0, Math.ceil(mini.time - (simTime - mini.start))); };
     sub.onclick = () => {
       if (sel < 0 || !mini || mini.done) return;
       const ok = sel === m.b; mini.reveal();
-      if (ok) why.style.color = '#8ce99a';
       miniEnd(ok, ok ? 'SHARP EYES, TA MATERIAL!' : 'MISSED IT');
     };
-    mBody.append(big, subt, el('div', 'mlabel', '📋 THE QUESTION'), head, el('div', 'mlabel', "✏️ THE STUDENT'S SOLUTION"), list, sub, why);
+    mBody.append(banner, el('div', 'psub', 'A student solved this question. One line of the solution is wrong. Tap it.'),
+      el('div', 'plabel', 'QUESTION'), q, el('div', 'plabel', "STUDENT'S SOLUTION"), sol, sub, fix);
   },
   // 🃏 memory pairs
   memory(){
