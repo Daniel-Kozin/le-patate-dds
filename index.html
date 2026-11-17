@@ -183,8 +183,10 @@
   .ring{position:absolute;left:50%;top:45%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:8px solid var(--c,#ffd43b);animation:ring 1s ease-out forwards;z-index:7}
   @keyframes ring{from{transform:scale(.2);opacity:1}to{transform:scale(30);opacity:0}}
   /* hard mode */
-  .modes{display:flex;gap:8px;margin:6px 0 2px}
-  .modes button{flex:1;background:#ece9f5;color:#4a4070;box-shadow:none;border:2px solid transparent;font-size:16px;padding:9px}
+  .modes{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+  .modes button.arc.sel{background:#e6fcf5;border-color:#12b886;color:#087f5b}
+  body.arcade .balldrop{display:none}
+  .modes button{flex:1 1 40%;background:#ece9f5;color:#4a4070;box-shadow:none;border:2px solid transparent;font-size:16px;padding:9px}
   .modes button.sel{background:#efe9ff;border-color:#7950f2;color:#2b1d5c}
   .modes button.hard.sel{background:#ffe3e3;border-color:#fa5252;color:#c92a2a}
   .tag{font-size:12px;font-weight:700;color:#fff;background:#fa5252;border-radius:8px;padding:2px 7px;margin-top:4px;display:inline-block;transform:rotate(-3deg)}
@@ -445,6 +447,7 @@
     <button id="muteBtn">🔊 Sound</button>
     <button id="musicBtn">🎵 Music</button>
     <button id="facesBtn">🖼 Faces</button>
+    <button id="arcadeBtn" title="Minigames mode">🎮</button>
     <button id="lbBtn" title="Leaderboard">🏆</button>
     <button id="infoBtn" title="Info">ℹ️</button>
     <button id="restartBtn">↻ Restart</button>
@@ -456,7 +459,7 @@
         <div class="qh"><span id="mTitle"></span><b id="mTime"></b></div>
         <div id="mBody"></div>
         <div class="qbar"><i id="mBar"></i></div>
-        <div class="qdrop">The game keeps going! A ball drops every 2 seconds.</div>
+        <div class="qdrop balldrop">The game keeps going! A ball drops every 2 seconds.</div>
       </div>
     </div>
     <div id="twrap" class="qwrap hidden">
@@ -483,7 +486,7 @@
         <div class="qo" id="qOpts"></div>
         <button id="qSubmit" class="qsub" type="button" disabled>Submit ✔</button>
         <div class="qbar"><i id="qBar"></i></div>
-        <div class="qdrop">A ball drops every 3 seconds until you answer!</div>
+        <div class="qdrop balldrop">A ball drops every 3 seconds until you answer!</div>
       </div>
     </div>
     <div id="over" class="overlay hidden">
@@ -529,7 +532,7 @@
     <h3>Who are you?</h3>
     <div class="idrow"><input id="idName" type="text" maxlength="16" placeholder="Your name" autocomplete="nickname" spellcheck="false"><select id="idMach" class="machIn" title="מחזור"><option value="">מחזור?</option><option value="ה">מחזור ה</option><option value="ו">מחזור ו</option><option value="ז">מחזור ז</option><option value="ח">מחזור ח</option><option value="ט">מחזור ט</option><option value="אחר">אחר</option></select></div>
     <h3 style="margin-top:12px">Pick a mode</h3>
-    <div class="modes"><button type="button" id="modeN">😊 Normal</button><button type="button" id="modeH" class="hard">🔥 Hard</button><button type="button" id="modeE" class="evi">💀 Eviatar</button></div>
+    <div class="modes"><button type="button" id="modeN">😊 Normal</button><button type="button" id="modeH" class="hard">🔥 Hard</button><button type="button" id="modeE" class="evi">💀 Eviatar</button><button type="button" id="modeM" class="arc">🎮 Minigames</button></div>
     <p class="modehint"><span id="modeSum"></span> <button type="button" id="rulesLink" class="linkbtn">📖 Rules</button></p>
     <div class="warn" id="nameWarn"></div>
     <div class="actions"><span style="flex:1"></span><button id="nameGo" class="add">Play!</button></div>
@@ -539,7 +542,7 @@
 <div id="rulesModal" class="modal hidden">
   <div class="panel">
     <h3>📖 How to play</h3>
-    <div class="rtabs"><button type="button" data-r="normal" class="sel">😊 Normal</button><button type="button" data-r="hard">🔥 Hard</button><button type="button" data-r="eviatar">💀 Eviatar</button></div>
+    <div class="rtabs"><button type="button" data-r="normal" class="sel">😊 Normal</button><button type="button" data-r="hard">🔥 Hard</button><button type="button" data-r="eviatar">💀 Eviatar</button><button type="button" data-r="minigames">🎮 Mini</button></div>
     <ul class="tut rpage" data-r="normal">
       <li><span>👆</span><div><b>Drop lecturers</b> into the board. Two of the same <b>merge</b> into the next, bigger one.</div></li>
       <li><span>⭐</span><div>Every merge gives points, and <b>bigger merges give more</b>.</div></li>
@@ -563,6 +566,13 @@
       <li><span>💣</span><div><b>Bomb ball</b>, <b>midterm wall</b>, Eviatar drops for you if you wait 5 seconds, and a <b>final exam</b> every 100 balls.</div></li>
       <li><span>✖️2</span><div>All points are <b>doubled</b>. Reach the end to get into <b>8200</b>.</div></li>
     </ul>
+    <ul class="tut rpage hidden" data-r="minigames">
+      <li><span>🎮</span><div><b>No balls, just challenges</b>, one after another, forever: quiz questions, Find the mistake, Who's this?, Memory pairs, The exam starts NOW, Coffee break, Type the word and Recite the lecture.</div></li>
+      <li><span>❤️</span><div>You have <b>3 lives</b>. A wrong answer or running out of time costs a life. Lose all 3 and it's over.</div></li>
+      <li><span>⭐</span><div>Every win is <b>+10</b>. Win 5 in a row and every win counts double, 10 in a row triple, and so on.</div></li>
+      <li><span>⚡</span><div>The quiz timer gets shorter the further you get.</div></li>
+      <li><span>🏆</span><div>It has <b>its own leaderboard</b>.</div></li>
+    </ul>
     <div class="actions"><span style="flex:1"></span><button id="rulesDone" type="button">Got it</button></div>
   </div>
 </div>
@@ -570,7 +580,7 @@
 <div id="lbModal" class="modal hidden">
   <div class="panel">
     <h3>🏆 Leaderboard</h3>
-    <div class="lbtabs"><button type="button" data-m="eviatar">💀 Eviatar</button><button type="button" data-m="hard">🔥 Hard</button><button type="button" data-m="normal">😊 Normal</button></div>
+    <div class="lbtabs"><button type="button" data-m="eviatar">💀 Eviatar</button><button type="button" data-m="hard">🔥 Hard</button><button type="button" data-m="normal">😊 Normal</button><button type="button" data-m="minigames">🎮 Mini</button></div>
     <div id="lbList"><ul class="lb" id="lbUl"></ul></div>
     <div class="lbnote" id="lbNote"></div>
     <div class="actions"><span style="flex:1"></span><button id="lbDone">Done</button></div>
@@ -1131,6 +1141,7 @@ let lastActionAt = 0, idleShown = false, dangerShown = false;
 const DROP_GAP = 0.3; // seconds between drops
 const boardFrozen = () => !!(qActive && qActive.board && !qActive.done);
 function drop(force){
+  if (isArcade()) return; // no balls in minigames mode
   if (over || boardFrozen() || (!force && (paused || challenge() || simTime < mossadLockUntil || simTime - lastDrop < (simTime < boostUntil ? 0.12 : DROP_GAP)))) return; // no manual drops during a quiz or the Mossad
   lastDrop = simTime;
   const r = RADII[cur];
@@ -1402,9 +1413,9 @@ function jackpot(x, y){
   updateHud();
 }
 function gameOver(reason){
-  logGameEnd(reason === 'time' ? 'time' : 'top');
+  logGameEnd(reason === 'time' || reason === 'lives' ? reason : 'top');
   over = true;
-  document.getElementById('overTitle').textContent = reason === 'time' ? 'Pens down! ✏️' : 'Moed Bet!';
+  document.getElementById('overTitle').textContent = reason === 'time' ? 'Pens down! ✏️' : reason === 'lives' ? 'Out of lives! 💔' : 'Moed Bet!';
   closeQuestion(); tbRemove(); eventsClear(); eviClear();
   sfx.sadTrombone();
   setTimeout(() => say('gameover', 'Oh non! See you in Moed Bet!', 100), 300);
@@ -1547,8 +1558,10 @@ function render(){
   const flash = dangerTime > 0 ? 0.4 + 0.6*Math.abs(Math.sin(simTime*12)) : 0.35;
   ctx.strokeStyle = dangerTime > 0 ? `rgba(230,40,40,${flash})` : 'rgba(200,80,60,.35)';
   ctx.setLineDash([10, 8]); ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(0, DANGER_Y); ctx.lineTo(W, DANGER_Y); ctx.stroke(); ctx.setLineDash([]);
-  if (!over){
+  if (!isArcade()){ ctx.beginPath(); ctx.moveTo(0, DANGER_Y); ctx.lineTo(W, DANGER_Y); ctx.stroke(); }
+  ctx.setLineDash([]);
+  if (isArcade()) drawArcade();
+  if (!over && !isArcade()){
     const r = RADII[cur], x = Math.max(wallIn + r, Math.min(W - wallIn - r, aimX));
     ctx.strokeStyle = 'rgba(80,50,140,.25)'; ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
     ctx.beginPath(); ctx.moveTo(x, SPAWN_Y + r); ctx.lineTo(x, H); ctx.stroke(); ctx.setLineDash([]);
@@ -2115,7 +2128,8 @@ function reciteEnd(ok){
   if (!recite){ rwrap.classList.add('hidden'); return; }
   recite = null;
   if (ok === null){ rwrap.classList.add('hidden'); return; }
-  if (ok){
+  if (isArcade()){ rMsg.textContent = ok ? '✅ Perfect recall!' : '❌ Wrong order!'; arcadeResult(ok); }
+  else if (ok){
     gain(50); addTime(TIME_RECITE); pushWalls();
     rMsg.textContent = '✅ Perfect recall!'; sfx.fanfare(); profPopup(true);
   } else {
@@ -2177,7 +2191,10 @@ function typeEnd(ok, timeout){
   typing.done = true; tIn.disabled = true; tIn.blur();
   tIn.classList.add(ok ? 'ok' : 'bad');
   if (ok) gstats.typeOk++; else gstats.typeBad++;
-  if (ok){
+  if (isArcade()){
+    if (!ok) [...tWord.children].forEach(sp => { if (sp.className !== 'g') sp.className = 'r'; });
+    arcadeResult(ok);
+  } else if (ok){
     gain(50); addTime(8); pushWalls();
     floatText(`SPELLED IT! +${50*cfg().mult}`, W/2, 140, '#69db7c', 24);
     sfx.fanfare(); profPopup(true);
@@ -2192,7 +2209,7 @@ function typeEnd(ok, timeout){
 // ---------- 🎲 Eviatar minigames ----------
 const mwrap = document.getElementById('mwrap'), mBody = document.getElementById('mBody'), mBar = document.getElementById('mBar');
 let mini = null, miniNext = 0, boostUntil = 0, miniBag = [];
-const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return testMode && a.length < 4 ? [...Array(N).keys()] : a; };
+const seenTiers = () => { const a = []; for (let t = 0; t < N; t++) if (isSeen(t)) a.push(t); return isArcade() || (testMode && a.length < 4) ? [...Array(N).keys()] : a; };
 function miniStart(){
   miniNext = simTime + 25 + Math.random()*20;
   if (!miniBag.length) miniBag = shuffled(['who', 'memory', 'react', 'coffee', 'mistake']); // precision drop is turned off
@@ -2231,7 +2248,8 @@ function miniEnd(ok, msg){
   if (mini.done) return;
   mini.done = true;
   if (ok) gstats.miniOk++; else gstats.miniBad++;
-  if (ok){
+  if (isArcade()) arcadeResult(ok);
+  else if (ok){
     if (mini.type === 'coffee'){ boostUntil = simTime + 10; addTime(4); }
     else { gain(50); addTime(6); pushWalls(); }
     floatText(msg || `NICE! +${50*cfg().mult}`, W/2, 140, '#69db7c', 24);
@@ -2475,10 +2493,11 @@ function drawEviOverlay(){
 
 // ---------- hard mode: pop quizzes ----------
 const Q_RIGHT = 25;
-const isHard = () => gameMode !== 'normal', isEvi = () => gameMode === 'eviatar';
+const isHard = () => gameMode === 'hard' || gameMode === 'eviatar', isEvi = () => gameMode === 'eviatar', isArcade = () => gameMode === 'minigames';
 const MODE = {
   hard:    {qEvery: 25, qTime: 15, auto: 3, wrong: 50,  demote: 1, fail: 10, mult: 1},
   eviatar: {qEvery: 15, qTime: 10, auto: 2, wrong: 100, demote: 2, fail: 15, mult: 2},
+  minigames: {qEvery: 1e9, qTime: 12, auto: 1e9, wrong: 0, demote: 0, fail: 0, mult: 1},
 };
 const cfg = () => MODE[gameMode] || MODE.hard;
 const challenge = () => !!(qActive || recite || typing); // a quiz, a recite or a typing test is on screen
@@ -2486,17 +2505,80 @@ let QUESTIONS = null;
 let MISTAKES = [], mistakeBag = [];
 fetch('mistakes.json').then(r => r.ok ? r.json() : null).then(v => { if (Array.isArray(v) && v.length) MISTAKES = v; }).catch(() => {});
 fetch('questions.json').then(r => r.ok ? r.json() : null).then(v => { if (Array.isArray(v) && v.length) QUESTIONS = v; }).catch(() => {});
-let gameMode = 'normal', pickedMode = ['hard', 'eviatar'].includes(store.get('lupatat-mode', 'normal')) ? store.get('lupatat-mode', 'normal') : 'normal';
+let gameMode = 'normal', pickedMode = ['hard', 'eviatar', 'minigames'].includes(store.get('lupatat-mode', 'normal')) ? store.get('lupatat-mode', 'normal') : 'normal';
 let qActive = null, qDrops = 0, qStart = 0, qLastAuto = 0, qBag = [];
 const qwrap = document.getElementById('qwrap'), qTimeEl = document.getElementById('qTime'), qBarEl = document.getElementById('qBar');
 function shuffled(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function setModeTag(){
   const tag = document.getElementById('modeTag');
-  tag.classList.toggle('hidden', !isHard());
-  tag.style.background = isEvi() ? '#212529' : '';
+  tag.classList.toggle('hidden', !isHard() && !isArcade());
+  tag.style.background = isEvi() ? '#212529' : isArcade() ? '#087f5b' : '';
+  if (isArcade()){ tag.textContent = `🎮 MINIGAMES · ${'❤️'.repeat(Math.max(0, arc.lives))}${'🖤'.repeat(Math.max(0, 3 - arc.lives))}`; return; }
   tag.textContent = `${isEvi() ? '💀 EVIATAR' : '🔥 HARD'} · quiz in ${Math.max(0, cfg().qEvery - qDrops)}`;
 }
+// ---------- 🎮 Minigames mode: endless challenges, no balls, 3 lives ----------
+let arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: []};
+const ARC_POOL = ['quiz', 'quiz', 'quiz', 'quiz', 'mistake', 'who', 'memory', 'react', 'coffee', 'type', 'recite'];
+function arcadeResult(ok){
+  arc.n++;
+  if (ok){
+    arc.streak++;
+    const mult = 1 + Math.floor((arc.streak - 1)/5), pts = 10*mult;
+    score += pts;
+    floatText(`+${pts}${mult > 1 ? ` 🔥×${mult}` : ''}`, W/2, 170, '#69db7c', 28);
+    sfx.fanfare();
+  } else {
+    arc.streak = 0; arc.lives--;
+    floatText(arc.lives > 0 ? `💔 ${arc.lives} ${arc.lives === 1 ? 'LIFE' : 'LIVES'} LEFT` : '💔 OUT OF LIVES', W/2, 170, '#ff6b6b', 26);
+    shake = 12; blip({type: 'sawtooth', f0: 160, f1: 60, dur: 0.6, vol: 0.18}); angryProf(false);
+    if (arc.lives <= 0) arc.dead = true;
+  }
+  setModeTag(); updateHud();
+}
+function arcadeStartNext(){
+  if (!arc.started){ arc.started = true; logEntry({t: 'start', mode: gameMode}); }
+  if (!arc.bag.length) arc.bag = shuffled(ARC_POOL);
+  for (let tries = 0; tries < 6; tries++){
+    const type = arc.bag.pop() || 'quiz';
+    if (type === 'quiz'){ if (!QUESTIONS) continue; openQuestion(); qActive.time = Math.max(7, 12 - Math.floor(arc.n/10)); return; }
+    if (type === 'type'){ typeStart(); return; }
+    if (type === 'recite'){ reciteStart(); if (recite) return; continue; }
+    if (type === 'mistake' && !MISTAKES.length) continue;
+    MINI[type](); return;
+  }
+  if (QUESTIONS) openQuestion();
+}
+function arcadeTick(){
+  if (qActive && !qActive.done){
+    const left = Math.max(0, qActive.time - (simTime - qStart));
+    qTimeEl.textContent = Math.ceil(left); qBarEl.style.width = (left/qActive.time*100) + '%';
+    if (left <= 0) answer(-1);
+  }
+  if (mini) miniTick();
+  if (typing) typeTick();
+  if (recite) reciteTick();
+  const busy = qActive || mini || typing || recite || !rwrap.classList.contains('hidden');
+  if (busy){ arc.idle = -1; return; }
+  if (arc.idle < 0){ arc.idle = simTime; return; }
+  if (simTime - arc.idle < 0.9) return;
+  arc.idle = -1;
+  if (arc.dead){ gameOver('lives'); return; }
+  arcadeStartNext();
+}
+function drawArcade(){
+  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(8,127,91,.08)'; ctx.fillRect(0, 0, W, H);
+  ctx.font = '700 64px Fredoka, sans-serif'; ctx.fillText('🎮', W/2, H*0.3);
+  ctx.fillStyle = '#087f5b'; ctx.font = '700 30px Fredoka, sans-serif'; ctx.fillText('MINIGAMES', W/2, H*0.3 + 62);
+  ctx.font = '34px sans-serif'; ctx.fillText('❤️'.repeat(Math.max(0, arc.lives)) + '🖤'.repeat(Math.max(0, 3 - arc.lives)), W/2, H*0.5);
+  ctx.fillStyle = '#2b1d5c'; ctx.font = '700 22px Fredoka, sans-serif';
+  ctx.fillText(`Challenge ${arc.n + 1}`, W/2, H*0.6);
+  if (arc.streak >= 2){ ctx.fillStyle = '#e8590c'; ctx.fillText(`🔥 ${arc.streak} in a row`, W/2, H*0.6 + 34); }
+  ctx.restore();
+}
 function hardReset(){
+  arc = {lives: 3, n: 0, streak: 0, dead: false, idle: -1, bag: []};
+  document.body.classList.toggle('arcade', isArcade());
   eventsReset(); eviReset();
   closeQuestion(); tbRemove();
   qDrops = 0; tbSchedule(); zhNext = ZH_EVERY;
@@ -2505,6 +2587,7 @@ function hardReset(){
 function closeQuestion(){ qActive = null; qwrap.classList.add('hidden'); }
 function hardTick(){
   if (over) return;
+  if (isArcade()){ arcadeTick(); return; }
   if (simTime >= zhNext){ zhNext = simTime + ZH_EVERY; sayChinese(); }
   if (challenge()){ cfNext += DT; mossadNext += DT; } // world events wait while a quiz is open
   else { ceasefireTick(); mossadTick(); }
@@ -2575,6 +2658,7 @@ function answer(k){
   qTotal++; if (ok) qRight++;
   qActive.btns[qActive.correct].classList.add('ok');
   if (!ok && k >= 0) qActive.btns[k].classList.add('bad');
+  if (isArcade()){ arcadeResult(ok); setTimeout(() => { closeQuestion(); setModeTag(); }, ok ? 800 : 1600); return; }
   if (qActive.exam){ examAnswer(ok, qActive.exam); return; }
   if (ok && isEvi()){ addTime(qActive.board ? TIME_BOARD_Q : TIME_QUIZ); pushWalls(); }
   if (ok){
@@ -2737,13 +2821,13 @@ const userKey = n => 'u_' + Array.from(n.trim().toLowerCase()).map(ch => /[a-z0-
 const nameModal = document.getElementById('nameModal');
 // ---------- global leaderboard (Firebase) ----------
 const FIREBASE_CONFIG = {"apiKey": "AIzaSyCyOjxfVO8SY_i2iTSNL9nkgo2iXJuvWWI", "authDomain": "le-patate-dds.firebaseapp.com", "projectId": "le-patate-dds", "storageBucket": "le-patate-dds.firebasestorage.app", "messagingSenderId": "915129683286", "appId": "1:915129683286:web:462ebba03178ae13721af7"};
-const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar'], LB_COLL = m => 'scores_' + m;
+const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar', 'minigames'], LB_COLL = m => 'scores_' + m;
 const lbKey = (n, mz) => 'u_' + Array.from(n.trim().toLowerCase() + (mz ? '~~' + mz : '')).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
 const MACH = ['ה', 'ו', 'ז', 'ח', 'ט', 'אחר'];
 const LB_MAX = 1000000;
 const lbRank = r => [r.navy ? 1 : 0, r.tier, r.score];
 const lbCmp = (a, b) => { const x = lbRank(a), y = lbRank(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return y[i] - x[i]; return 0; };
-let fb = null, lbRows = {normal: [], hard: [], eviatar: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading'}, lbView = 'eviatar';
+let fb = null, lbRows = {normal: [], hard: [], eviatar: [], minigames: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading', minigames: 'loading'}, lbView = 'eviatar';
 const fbReady = (async () => {
   if (!FIREBASE_CONFIG){ LB_MODES.forEach(m => lbState[m] = 'off'); return null; }
   try{
@@ -2803,7 +2887,7 @@ async function saveFromGameOver(){
   if (!MACH.includes(mach)){ saveNote.textContent = 'Pick your מחזור first 👆'; machIn.focus(); return; }
   username = name; store.set('lupatat-username', name); store.set('lupatat-machzor', mach); prepareShare();
   saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
-  const run = {navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))};
+  const run = isArcade() ? {navy: false, tier: 0, score: Math.max(0, Math.floor(score))} : {navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))};
   const r = await lbSave(name, mach, gameMode, run);
   if (r.ok){
     saveBtn.textContent = '✔ Saved';
@@ -2823,7 +2907,7 @@ function lbItem(r, i, me, mode){
   const tp = document.createElement('span'); tp.className = 'tp';
   if (r.navy && mode === 'eviatar'){ const u = document.createElement('span'); u.className = 'u82'; u.textContent = '8200'; tp.appendChild(u); tp.title = 'שובצת ב־8200'; }
   else if (r.navy){ tp.textContent = '⚓'; tp.title = 'שובצת בחיל הים'; }
-  else if (r.tier >= 0 && r.tier < N){ const cv = document.createElement('canvas'); cv.width = cv.height = 48; drawMini(cv, r.tier, false); tp.appendChild(cv); tp.title = P(r.tier).name; }
+  else if (mode !== 'minigames' && r.tier >= 0 && r.tier < N){ const cv = document.createElement('canvas'); cv.width = cv.height = 48; drawMini(cv, r.tier, false); tp.appendChild(cv); tp.title = P(r.tier).name; }
   const nm = document.createElement('span'); nm.className = 'nm'; nm.append(r.name);
   if (r.mach){ const mz = document.createElement('bdi'); mz.className = 'mz'; mz.textContent = r.mach === 'אחר' ? 'אחר' : 'מחזור ' + r.mach; nm.append(' - ', mz); }
   const sc = document.createElement('span'); sc.className = 'sc'; sc.textContent = r.score;
@@ -2869,8 +2953,8 @@ const firstVisit = !store.get('lupatat-visited', false); store.set('lupatat-visi
 logEntry({t: 'visit', first: firstVisit});
 let gameLogged = false;
 function logGameEnd(end){
-  if (over && end !== 'time' && end !== 'top') return; // already over (and already logged)
-  if (gameLogged || testMode || !gstats || (gstats.drops < 3 && (end === 'restart' || end === 'closed'))) return;
+  if (over && end !== 'time' && end !== 'top' && end !== 'lives') return; // already over (and already logged)
+  if (gameLogged || testMode || !gstats || ((isArcade() ? arc.n < 2 : gstats.drops < 3) && (end === 'restart' || end === 'closed'))) return;
   gameLogged = true;
   logEntry({t: 'game', mode: gameMode, end, score: Math.max(0, Math.floor(score)), tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), navy: !!gotSecret,
     dur: Math.round(simTime), drops: gstats.drops, merges: gstats.merges, qok: qRight, qn: qTotal, mok: gstats.miniOk, mbad: gstats.miniBad, tok: gstats.typeOk, tbad: gstats.typeBad});
@@ -2886,14 +2970,14 @@ document.getElementById('admRefresh').onclick = () => loadAdmin();
 adminModal.addEventListener('click', e => { if (e.target === adminModal){ adminModal.classList.add('hidden'); paused = false; } });
 function openAdmin(){ closeInfo(); paused = true; adminModal.classList.remove('hidden'); loadAdmin(); }
 { const ab = document.getElementById('adminBtn'); if (ab) ab.onclick = openAdmin; }
-const MODE_NAME = {normal: 'Normal', hard: 'Hard', eviatar: 'Eviatar'};
+const MODE_NAME = {normal: 'Normal', hard: 'Hard', eviatar: 'Eviatar', minigames: 'Minigames'};
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const ago = t => { const s = (Date.now() - t)/1000; return s < 60 ? 'just now' : s < 3600 ? Math.floor(s/60) + 'm ago' : s < 86400 ? Math.floor(s/3600) + 'h ago' : Math.floor(s/86400) + 'd ago'; };
 const mmss = s => `${Math.floor(s/60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 const pct = (a, b) => b ? Math.round(100*a/b) + '%' : '-';
 const dayKey = t => { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 const who2 = e => e.n ? esc(e.n) + (e.m && e.m !== 'אחר' ? ` <span class="mz">- מחזור ${esc(e.m)}</span>` : '') : `<span class="anon">anon #${esc(String(e.v || '').slice(0, 4))}</span>`;
-const tierCell = e => e.navy ? (e.mode === 'eviatar' ? '<span class="u82">8200</span>' : '⚓') : (Number.isInteger(e.tier) && e.tier >= 0 && e.tier < N ? esc(P(e.tier).name) : '-');
+const tierCell = e => e.mode === 'minigames' ? '-' : e.navy ? (e.mode === 'eviatar' ? '<span class="u82">8200</span>' : '⚓') : (Number.isInteger(e.tier) && e.tier >= 0 && e.tier < N ? esc(P(e.tier).name) : '-');
 function bars(vals, labels, title, fmt = v => v){
   const max = Math.max(1, ...vals);
   return `<div class="admchart"><div class="admct">${title}</div><div class="admbars">` + vals.map((v, i) =>
@@ -2944,7 +3028,7 @@ async function loadAdmin(){
     h += '<h4>By mode</h4><table class="admt"><tr><th>Mode</th><th>Games</th><th>Players</th><th>Avg score</th><th>Best</th><th>Avg length</th><th>Reached the end</th></tr>' +
       LB_MODES.map(m => { const g = games.filter(e => e.mode === m); return `<tr><td>${MODE_NAME[m]}</td><td>${g.length}</td><td>${new Set(g.map(e => e.v)).size}</td><td>${g.length ? Math.round(g.reduce((a, e) => a + e.score, 0)/g.length) : '-'}</td><td>${g.length ? Math.max(...g.map(e => e.score)) : '-'}</td><td>${g.length ? mmss(g.reduce((a, e) => a + (e.dur || 0), 0)/g.length) : '-'}</td><td>${g.filter(e => e.navy).length}</td></tr>`; }).join('') + '</table>';
     const ends = {}; games.forEach(e => ends[e.end] = (ends[e.end] || 0) + 1);
-    const END = {top: 'Board overflowed', time: 'Exam time ran out', restart: 'Restarted', closed: 'Closed the page'};
+    const END = {top: 'Board overflowed', time: 'Exam time ran out', lives: 'Out of lives', restart: 'Restarted', closed: 'Closed the page'};
     h += '<h4>How games end</h4><div class="admcards">' + Object.entries(ends).map(([k, v]) => card(v, END[k] || k)).join('') + '</div>';
     // each start: did that player finish the game? (their next finished game before their next start)
     const status = st => {
@@ -3009,7 +3093,7 @@ const TEASE = [
 ];
 const PASSED = [n => `🔥 You just passed ${n}!`, n => `👋 Bye bye ${n}`, n => `😭 ${n} is crying now. You passed them!`];
 let teaseNext = 60, teaseLast = -1, teaseAbove = null;
-const liveRun = () => ({navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))});
+const liveRun = () => isArcade() ? {navy: false, tier: 0, score: Math.max(0, Math.floor(score))} : ({navy: !!gotSecret, tier: gotSecret ? N : Math.max(0, Math.min(topTier, N - 1)), score: Math.max(0, Math.floor(score))});
 setInterval(() => {
   if (testMode || over || paused || lbState[gameMode] !== 'ok') return;
   if (simTime < teaseLast){ teaseNext = 60; teaseAbove = null; } // a new game started
@@ -3079,18 +3163,21 @@ function startTestRun(mode){
   floatText(mode === 'eviatar' ? '🧪 EVIATAR TEST: 4 GILAS' : '🧪 TEST RUN: 4 GILAS', W/2, 200, '#ffd43b', 22);
 }
 const tutModal = document.getElementById('tutModal');
-const MODE_SUM = {normal: 'Merge lecturers, keep the pile below the dashed line.', hard: 'Plus pop quizzes every 25 balls, a turtle and random events.', eviatar: 'Everything in Hard, plus an exam clock, a shrinking board and minigames.'};
+const MODE_SUM = {normal: 'Merge lecturers, keep the pile below the dashed line.', hard: 'Plus pop quizzes every 25 balls, a turtle and random events.', eviatar: 'Everything in Hard, plus an exam clock, a shrinking board and minigames.', minigames: 'No balls: endless quizzes and minigames, 3 lives.'};
 function setPicked(m){
   pickedMode = m; store.set('lupatat-mode', m);
   const ms = document.getElementById('modeSum'); if (ms) ms.textContent = MODE_SUM[m] || '';
   document.getElementById('modeN').classList.toggle('sel', m === 'normal');
   document.getElementById('modeH').classList.toggle('sel', m === 'hard');
   document.getElementById('modeE').classList.toggle('sel', m === 'eviatar');
-  document.getElementById('nameGo').textContent = m === 'eviatar' ? 'Play Eviatar 💀' : m === 'hard' ? 'Play hard 🔥' : 'Play!';
+  document.getElementById('modeM').classList.toggle('sel', m === 'minigames');
+  document.getElementById('nameGo').textContent = m === 'eviatar' ? 'Play Eviatar 💀' : m === 'hard' ? 'Play hard 🔥' : m === 'minigames' ? 'Play minigames 🎮' : 'Play!';
 }
 document.getElementById('modeN').onclick = () => setPicked('normal');
 document.getElementById('modeH').onclick = () => setPicked('hard');
 document.getElementById('modeE').onclick = () => setPicked('eviatar');
+document.getElementById('modeM').onclick = () => setPicked('minigames');
+document.getElementById('arcadeBtn').onclick = () => { askName(); setPicked('minigames'); };
 setPicked(pickedMode);
 function startPlaying(){
   if (!identityOk()) return;
