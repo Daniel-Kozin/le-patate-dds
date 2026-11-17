@@ -87,6 +87,10 @@
   .link.mys span{opacity:.6;letter-spacing:1px}
   .nameIn{width:100%;font-family:inherit;font-size:20px;font-weight:600;padding:10px 12px;border:2px solid #cfc5ff;border-radius:12px;background:#fff;color:#2b1d5c;-webkit-text-fill-color:#2b1d5c;user-select:text;-webkit-user-select:text;margin:4px 0 2px}
   .nameIn:focus{outline:none;border-color:#7950f2}
+  .savebox{display:flex;gap:6px;width:100%;max-width:300px}
+  .savebox .nameIn{font-size:17px;padding:8px 10px;margin:0;flex:1;min-width:0}
+  .savebox button{flex:none;font-size:15px;padding:8px 12px;background:#ffd43b;color:#2b1d5c}
+  .savebox button:disabled{background:#8ce99a;cursor:default}
   .lb{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
   .lb li{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:#f7f5ff;font-size:15px;color:#2b1d5c}
   .lb li.me{background:#ffe8a3;font-weight:700}
@@ -314,7 +318,7 @@
     <button id="muteBtn">🔊 Sound</button>
     <button id="musicBtn">🎵 Music</button>
     <button id="facesBtn">🖼 Faces</button>
-    <button id="lbBtn">🏆 Top</button>
+    <button id="lbBtn" title="Leaderboard">🏆</button>
     <button id="infoBtn" title="Info">ℹ️</button>
     <button id="restartBtn">↻ Restart</button>
   </div>
@@ -358,7 +362,11 @@
     <div id="over" class="overlay hidden">
       <h2 id="overTitle">Moed Bet!</h2>
       <p>Score: <b id="finalScore">0</b></p>
-      <div class="who">Playing as <b id="overName"></b><button id="changeName" type="button">Change player</button></div>
+      <div class="savebox">
+        <input id="overNameIn" class="nameIn" type="text" maxlength="16" placeholder="Your name" spellcheck="false" autocomplete="off">
+        <button id="saveBtn" type="button" class="hidden">💾 Save score</button>
+      </div>
+      <div class="copied" id="saveNote"></div>
       <div class="olb"><ul class="lb" id="overLb"></ul><div class="lbnote" id="overNote"></div></div>
       <div class="share">
         <a id="waBtn" class="wa" href="#" target="_blank" rel="noopener">📱 Send on WhatsApp</a>
@@ -390,9 +398,7 @@
 <div id="fx"></div>
 <div id="nameModal" class="modal hidden">
   <div class="panel">
-    <h3>Who's playing?</h3>
-    <p class="hint">Your name goes on the global leaderboard.</p>
-    <input id="nameIn" class="nameIn" type="text" maxlength="16" placeholder="Username" spellcheck="false" autocomplete="off">
+    <h3>Pick a mode</h3>
     <div class="modes"><button type="button" id="modeN">😊 Normal</button><button type="button" id="modeH" class="hard">🔥 Hard</button><button type="button" id="modeE" class="evi">💀 Eviatar</button></div>
     <div class="warn" id="nameWarn"></div>
     <div class="actions"><span style="flex:1"></span><button id="nameGo" class="add">Play!</button></div>
@@ -402,7 +408,7 @@
 <div id="lbModal" class="modal hidden">
   <div class="panel">
     <h3>🏆 Leaderboard</h3>
-    <div class="lbtabs"><button type="button" data-m="normal">😊 Normal</button><button type="button" data-m="hard">🔥 Hard</button><button type="button" data-m="eviatar">💀 Eviatar</button></div>
+    <div class="lbtabs"><button type="button" data-m="eviatar">💀 Eviatar</button><button type="button" data-m="hard">🔥 Hard</button><button type="button" data-m="normal">😊 Normal</button></div>
     <div id="lbList"><ul class="lb" id="lbUl"></ul></div>
     <div class="lbnote" id="lbNote"></div>
     <div class="actions"><span style="flex:1"></span><button id="lbDone">Done</button></div>
@@ -875,14 +881,12 @@ function reset(){
   balls = []; nid = 1; score = 0; cur = spawn(); next = spawn(); aimX = W/2; lastDrop = -1e9;
   dangerTime = 0; over = false; floats = []; parts = []; seenTier = new Set([0,1,2]); comboCount = 0; comboTimer = 0; shake = 0; simTime = 0;
   document.getElementById('over').classList.add('hidden');
-  lbSaved = 0; clearTimeout(lbTimer); lbTimer = 0;
   bestAtStart = best; topTier = Math.max(cur, next); qRight = 0; qTotal = 0; gotSecret = false;
   hardReset();
   discover(cur); discover(next);
   updateHud();
 }
 function updateHud(){
-  if (typeof lbLive === 'function') lbLive();
   document.getElementById('score').textContent = score;
   if (!testMode && score > best){ best = score; store.set('lupatat-best', best); }
   document.getElementById('best').textContent = best;
@@ -1165,11 +1169,13 @@ function gameOver(reason){
   meme(null, {custom: ['⚰️','F IN THE CHAT','bounce'], side: 'r', force: true, big: true, top: 30});
   emojiRain(['💀','😭','📉','🪦'], 22);
   document.getElementById('finalScore').textContent = score;
-  document.getElementById('overName').textContent = username || '?';
+  overNameIn.value = username || '';
+  document.getElementById('saveNote').textContent = '';
+  const sb = document.getElementById('saveBtn'); sb.disabled = false; sb.textContent = '💾 Save score';
   document.getElementById('over').classList.remove('hidden');
   updateHud();
   prepareShare();
-  lbSave(score, true); renderLb();
+  renderLb(); if (testMode) saveBtn.classList.add('hidden'); else saveBtn.classList.remove('hidden');
 }
 
 // ---------- physics ----------
@@ -1416,7 +1422,9 @@ setMusicLabel();
 function newGame(){ clearTimeout(navyTimer); navyTimer = 0; audio(); decodeClips(); stopVoice(); clearAnnouncements(); reset(); say('restart', 'Le patate! New semester!', 50); }
 document.getElementById('restartBtn').onclick = () => askName();
 document.getElementById('againBtn').onclick = () => askName();
-document.getElementById('changeName').onclick = () => askName(true);
+// the name is only asked for at the end of a game
+const overNameIn = document.getElementById('overNameIn');
+overNameIn.addEventListener('input', () => { username = cleanName(overNameIn.value); store.set('lupatat-username', username); prepareShare(); });
 
 // ---------- chain ----------
 const chainEl = document.getElementById('chain'), rowsEl = document.getElementById('rows');
@@ -2438,12 +2446,12 @@ function punish(timeout){
 let username = store.get('lupatat-username', '');
 const cleanName = v => (v || '').replace(/\s+/g, ' ').trim().slice(0, 16);
 const userKey = n => 'u_' + Array.from(n.trim().toLowerCase()).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
-const nameModal = document.getElementById('nameModal'), nameIn = document.getElementById('nameIn');
+const nameModal = document.getElementById('nameModal');
 // ---------- global leaderboard (Firebase) ----------
 const FIREBASE_CONFIG = {"apiKey": "AIzaSyCyOjxfVO8SY_i2iTSNL9nkgo2iXJuvWWI", "authDomain": "le-patate-dds.firebaseapp.com", "projectId": "le-patate-dds", "storageBucket": "le-patate-dds.firebasestorage.app", "messagingSenderId": "915129683286", "appId": "1:915129683286:web:462ebba03178ae13721af7"};
 const FB_VER = '10.12.2', LB_MODES = ['normal', 'hard', 'eviatar'], LB_COLL = m => 'scores_' + m;
 const lbKey = n => 'u_' + Array.from(n.trim().toLowerCase()).map(ch => /[a-z0-9_.-]/.test(ch) ? ch : '~' + ch.codePointAt(0).toString(36)).join('');
-let fb = null, lbRows = {normal: [], hard: [], eviatar: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading'}, lbView = 'normal';
+let fb = null, lbRows = {normal: [], hard: [], eviatar: []}, lbState = {normal: 'loading', hard: 'loading', eviatar: 'loading'}, lbView = 'eviatar';
 const fbReady = (async () => {
   if (!FIREBASE_CONFIG){ LB_MODES.forEach(m => lbState[m] = 'off'); return null; }
   try{
@@ -2460,27 +2468,37 @@ const fbReady = (async () => {
     return fb;
   }catch(e){ LB_MODES.forEach(m => lbState[m] = 'error'); renderLb(); return null; }
 })();
-let lbQueue = Promise.resolve(), lbSaved = 0, lbTimer = 0;
-function lbSave(sc, played){
-  const name = username, mode = gameMode;
-  if (!name || testMode) return;
-  if (!played) lbSaved = Math.max(lbSaved, sc);
-  lbQueue = lbQueue.then(async () => {
-    const F = await fbReady; if (!F) return;
-    const {fs, db} = F, ref = fs.doc(db, LB_COLL(mode), lbKey(name));
-    try{
-      const snap = await fs.getDoc(ref), prev = snap.exists() ? snap.data() : null;
-      const old = prev ? Math.floor(+prev.score) || 0 : -1;
-      if (prev && sc <= old && !played) return;
-      await fs.setDoc(ref, {name, score: Math.max(old, Math.floor(sc), 0), games: ((prev && Math.floor(+prev.games)) || 0) + (played ? 1 : 0), at: Date.now()});
-    }catch(e){}
-  });
+// a player's entry keeps only their best score in that mode
+async function lbSave(name, mode, sc){
+  const F = await fbReady; if (!F) return {ok: false};
+  const {fs, db} = F, ref = fs.doc(db, LB_COLL(mode), lbKey(name));
+  try{
+    const snap = await fs.getDoc(ref), prev = snap.exists() ? snap.data() : null;
+    const old = prev ? Math.floor(+prev.score) || 0 : -1, best = Math.max(old, Math.floor(sc), 0);
+    await fs.setDoc(ref, {name: prev ? prev.name : name, score: best, games: ((prev && Math.floor(+prev.games)) || 0) + 1, at: Date.now()});
+    return {ok: true, best, improved: Math.floor(sc) > old};
+  }catch(e){ return {ok: false}; }
 }
-function lbLive(){ // save the best score so far every few seconds while playing
-  if (testMode || !username || score <= lbSaved || lbTimer) return;
-  lbTimer = setTimeout(() => { lbTimer = 0; if (score > lbSaved) lbSave(score, false); }, 3000);
+const saveBtn = document.getElementById('saveBtn'), saveNote = document.getElementById('saveNote');
+async function saveFromGameOver(){
+  if (saveBtn.disabled) return;
+  const name = cleanName(overNameIn.value);
+  if (!name){ saveNote.textContent = 'Type your name first 👆'; overNameIn.focus(); return; }
+  username = name; store.set('lupatat-username', name); prepareShare();
+  saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+  const r = await lbSave(name, gameMode, score);
+  if (r.ok){
+    saveBtn.textContent = '✔ Saved';
+    saveNote.textContent = r.improved ? `🏆 New best: ${r.best}` : `Saved. Your best is still ${r.best}`;
+    renderLb();
+  } else {
+    saveBtn.disabled = false; saveBtn.textContent = '💾 Save score';
+    saveNote.textContent = "Couldn't save. Check your connection and try again.";
+  }
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && score > lbSaved) lbSave(score, false); });
+saveBtn.classList.remove('hidden');
+saveBtn.onclick = saveFromGameOver;
+overNameIn.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); saveFromGameOver(); } });
 function lbItem(r, i, me){
   const li = document.createElement('li'); if (me) li.className = 'me';
   const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = i < 3 ? ['🥇', '🥈', '🥉'][i] : (i + 1) + '.';
@@ -2509,7 +2527,7 @@ function renderLb(){
 }
 document.querySelectorAll('.lbtabs button').forEach(b => b.onclick = () => { lbView = b.dataset.m; renderLb(); });
 const lbModal = document.getElementById('lbModal');
-document.getElementById('lbBtn').onclick = () => { if (!nameModal.classList.contains('hidden')) return; paused = true; lbView = gameMode; renderLb(); lbModal.classList.remove('hidden'); };
+document.getElementById('lbBtn').onclick = () => { if (!nameModal.classList.contains('hidden')) return; paused = true; lbView = 'eviatar'; renderLb(); lbModal.classList.remove('hidden'); };
 function closeLb(){ lbModal.classList.add('hidden'); paused = false; }
 document.getElementById('lbDone').onclick = closeLb;
 lbModal.addEventListener('click', e => { if (e.target === lbModal) closeLb(); });
@@ -2546,14 +2564,11 @@ document.getElementById('copyBtn').onclick = async () => {
 };
 
 // the game in progress ends: save it for the player and mode that played it
-function endCurrentGame(){ if (!over && score > 0) lbSave(score, true); score = 0; }
+function endCurrentGame(){ score = 0; }
 function askName(change){
   endCurrentGame();
   paused = true;
-  nameIn.value = change ? '' : username;
-  document.getElementById('nameWarn').textContent = '';
   nameModal.classList.remove('hidden');
-  setTimeout(() => { nameIn.focus(); nameIn.select(); }, 30);
 }
 function startTestRun(){
   closeInfo();
@@ -2576,9 +2591,6 @@ document.getElementById('modeH').onclick = () => setPicked('hard');
 document.getElementById('modeE').onclick = () => setPicked('eviatar');
 setPicked(pickedMode);
 function startPlaying(){
-  const n = cleanName(nameIn.value);
-  if (!n){ document.getElementById('nameWarn').textContent = 'Type a username first.'; nameIn.focus(); return; }
-  username = n; store.set('lupatat-username', n);
   // first time in hard mode: show what's new
   if (pickedMode === 'hard' && !store.get('lupatat-hard-tut4', false)){
     nameModal.classList.add('hidden'); tutModal.classList.remove('hidden'); return;
@@ -2592,7 +2604,7 @@ function startPlaying(){
   beginGame();
 }
 function beginGame(){
-  setTimeout(() => { if (username && !testMode) lbSave(0, false); lbView = gameMode; renderLb(); }, 0);
+  setTimeout(renderLb, 0);
   testMode = false; testQueue = [];
   gameMode = pickedMode;
   nameModal.classList.add('hidden'); tutModal.classList.add('hidden'); newsModal.classList.add('hidden'); eviModal.classList.add('hidden'); paused = false;
@@ -2606,7 +2618,7 @@ document.getElementById('newsGo').onclick = () => { store.set('lupatat-news2', t
 document.getElementById('newsBack').onclick = () => { newsModal.classList.add('hidden'); nameModal.classList.remove('hidden'); };
 document.getElementById('tutBack').onclick = () => { tutModal.classList.add('hidden'); nameModal.classList.remove('hidden'); };
 document.getElementById('nameGo').onclick = startPlaying;
-nameIn.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); startPlaying(); } });
+window.addEventListener('keydown', e => { if (e.key === 'Enter' && !nameModal.classList.contains('hidden')){ e.preventDefault(); startPlaying(); } });
 
 // shared storage is used only for the secret character the owner sets
 let db = null, userCap = null, isOwner = false;
